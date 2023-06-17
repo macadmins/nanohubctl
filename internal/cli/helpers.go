@@ -74,6 +74,21 @@ func getReq(url string, resp **http.Response) error {
 	return nil
 }
 
+func deleteReq(url string, resp **http.Response) error {
+	username := "kmfddm"
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	auth := username + ":" + viper.GetString("api_key")
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
+	req.Header.Add("Authorization", "Basic "+encodedAuth)
+
+	*resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func PrettyJsonPrint(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
