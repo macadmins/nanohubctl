@@ -11,9 +11,6 @@ import (
 
 var (
 	// These vars are available to every sub command
-	url   string
-	key   string
-	id    string
 	debug bool
 	vv    bool
 
@@ -27,8 +24,8 @@ func ExecuteWithContext(ctx context.Context) error {
 func rootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   fmt.Sprintf("ddmctl"),
-		Short: "A source control friendly binary storage system",
-		Long:  "A source control friendly binary storage system",
+		Short: "A command line tool for working with ddm",
+		Long:  "A command line tool for working with declarative device management",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			setLoggerOpts()
 		},
@@ -43,9 +40,9 @@ func rootCmd() *cobra.Command {
 	}
 
 	// At the rootCmd level, set these global flags that will be available to downstream cmds
-	rootCmd.PersistentFlags().StringVar(&url, "url", "", "URL of the ddm instance")
-	rootCmd.PersistentFlags().StringVar(&key, "api_key", "", "API key for the ddm instance")
-	rootCmd.PersistentFlags().StringVar(&id, "client_id", "", "Client ID to apply items to")
+	rootCmd.PersistentFlags().String("url", "", "URL of the ddm instance")
+	rootCmd.PersistentFlags().String("api_key", "", "API key for the ddm instance")
+	rootCmd.PersistentFlags().String("client_id", "", "Client ID to apply items to")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Run in debug mode")
 	rootCmd.PersistentFlags().BoolVar(&vv, "vv", false, "Run in verbose logging mode")
 
@@ -61,7 +58,7 @@ func rootCmd() *cobra.Command {
 
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
-		applyCmd(),
+		declarationCmd(),
 		// getCmd(),
 		// deleteCmd(),
 	)

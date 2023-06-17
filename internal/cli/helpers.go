@@ -1,8 +1,11 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/base64"
 	"errors"
 	"log"
+	"net/http"
 
 	"github.com/google/logger"
 	"github.com/spf13/cobra"
@@ -30,11 +33,27 @@ func applyPreExecFn(cmd *cobra.Command, args []string) error {
 
 	// Make sure mandatory values are present before continuing
 	if viper.GetString("URL") == "" {
-		return errors.New("Url must be provided!")
+		return errors.New("Base Url must be provided!")
 	}
 	if viper.GetString("API_KEY") == "" {
-		return errors.New("Key must be provided!")
+		return errors.New("API Key must be provided!")
 	}
 
+	return nil
+}
+
+func putReq(url string, jsonBytes []byte, resp **http.Response) error {
+	username := "kmfddm"
+
+	body := bytes.NewBuffer(jsonBytes)
+	req, err := http.NewRequest("PUT", url, body)
+	auth := username + ":" + viper.GetString("api_key")
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
+	req.Header.Add("Authorization", "Basic "+encodedAuth)
+
+	*resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
 	return nil
 }
