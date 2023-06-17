@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path"
 
@@ -11,8 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var jsonPayload string
 
 func declarationCmd() *cobra.Command {
 	declarationCmd := &cobra.Command{
@@ -29,7 +29,7 @@ func declarationCmd() *cobra.Command {
 	}
 	declarationCmd.AddCommand(
 		createCmd(),
-		// getCmd(),
+		getCmd(),
 		// deleteCmd(),
 	)
 
@@ -46,8 +46,8 @@ func createCmd() *cobra.Command {
 		RunE:    createFn,
 	}
 
-	createCmd.PersistentFlags().StringVarP(&jsonPayload, "json", "j", "", "json payload to create a declaration")
-	createCmd.MarkPersistentFlagRequired("json")
+	createCmd.Flags().StringP("json", "j", "", "json payload to create a declaration")
+	createCmd.MarkFlagRequired("json")
 
 	return createCmd
 }
@@ -67,7 +67,7 @@ func createFn(cmd *cobra.Command, declarations []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path + "v1/declarations")
+	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
 	var resp *http.Response
 	err = putReq(ddmUrl.String(), jsonBytes, &resp)
 	if err != nil {
@@ -75,5 +75,52 @@ func createFn(cmd *cobra.Command, declarations []string) error {
 	}
 	defer resp.Body.Close()
 	fmt.Println(resp.Status)
+	return nil
+}
+
+// getCmd handles getting declarations on the server
+func getCmd() *cobra.Command {
+	getCmd := &cobra.Command{
+		Use:     "get",
+		Short:   fmt.Sprintf("create a declaration"),
+		Long:    fmt.Sprintf("create a declaration"),
+		PreRunE: applyPreExecFn,
+		RunE:    getFn,
+	}
+
+	getCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
+	getCmd.MarkFlagRequired("identifier")
+
+	return getCmd
+}
+
+func getFn(cmd *cobra.Command, declarations []string) error {
+	identifier, err := cmd.Flags().GetString("identifier")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Getting declaration for identifier %s\n", identifier)
+	ddmUrl, err := url.Parse(viper.GetString("url"))
+	if err != nil {
+		return err
+	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
+	var resp *http.Response
+	err = getReq(ddmUrl.String(), &resp)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println(resp.Status)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	var jsonResponse map[string]interface{}
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
+		return err
+	}
+	fmt.Println(PrettyJsonPrint(jsonResponse))
 	return nil
 }
