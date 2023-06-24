@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path"
 
@@ -28,22 +29,22 @@ func declarationCmd() *cobra.Command {
 		},
 	}
 	declarationCmd.AddCommand(
-		createCmd(),
-		getCmd(),
-		deleteCmd(),
+		createDeclarationCmd(),
+		getDeclarationCmd(),
+		deleteDeclarationCmd(),
 	)
 
 	return declarationCmd
 }
 
 // createCmd handles creating declarations on the server
-func createCmd() *cobra.Command {
+func createDeclarationCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "create",
 		Short:   fmt.Sprintf("create a declaration"),
 		Long:    fmt.Sprintf("create a declaration"),
 		PreRunE: applyPreExecFn,
-		RunE:    createFn,
+		RunE:    createDeclarationFn,
 	}
 
 	createCmd.Flags().StringP("json", "j", "", "json payload to create a declaration")
@@ -52,7 +53,7 @@ func createCmd() *cobra.Command {
 	return createCmd
 }
 
-func createFn(cmd *cobra.Command, declarations []string) error {
+func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	jsonPath, err := cmd.Flags().GetString("json")
 	if err != nil {
 		return err
@@ -69,7 +70,7 @@ func createFn(cmd *cobra.Command, declarations []string) error {
 	}
 	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
 	var resp *http.Response
-	err = putReq(ddmUrl.String(), jsonBytes, &resp)
+	err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
 	if err != nil {
 		return err
 	}
@@ -79,13 +80,13 @@ func createFn(cmd *cobra.Command, declarations []string) error {
 }
 
 // getCmd handles getting declarations on the server
-func getCmd() *cobra.Command {
+func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "get",
 		Short:   fmt.Sprintf("get a declaration"),
 		Long:    fmt.Sprintf("get a declaration"),
 		PreRunE: applyPreExecFn,
-		RunE:    getFn,
+		RunE:    getDeclarationFn,
 	}
 
 	getCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
@@ -94,7 +95,7 @@ func getCmd() *cobra.Command {
 	return getCmd
 }
 
-func getFn(cmd *cobra.Command, declarations []string) error {
+func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	identifier, err := cmd.Flags().GetString("identifier")
 	if err != nil {
 		return err
@@ -126,13 +127,13 @@ func getFn(cmd *cobra.Command, declarations []string) error {
 }
 
 // getCmd handles getting declarations on the server
-func deleteCmd() *cobra.Command {
+func deleteDeclarationCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete",
 		Short:   fmt.Sprintf("delete a declaration"),
 		Long:    fmt.Sprintf("delete a declaration"),
 		PreRunE: applyPreExecFn,
-		RunE:    deleteFn,
+		RunE:    deleteDeclarationFn,
 	}
 
 	deleteCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
@@ -141,7 +142,7 @@ func deleteCmd() *cobra.Command {
 	return deleteCmd
 }
 
-func deleteFn(cmd *cobra.Command, declarations []string) error {
+func deleteDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	identifier, err := cmd.Flags().GetString("identifier")
 	if err != nil {
 		return err
@@ -158,6 +159,11 @@ func deleteFn(cmd *cobra.Command, declarations []string) error {
 		return err
 	}
 	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(string(body))
 	fmt.Println(resp.Status)
 	return nil
 }

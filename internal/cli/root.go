@@ -59,7 +59,7 @@ func rootCmd() *cobra.Command {
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
 		declarationCmd(),
-		// setCmd(),
+		setCmd(),
 		// statuCmd(),
 	)
 

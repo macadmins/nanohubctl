@@ -43,7 +43,23 @@ func applyPreExecFn(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func putReq(url string, jsonBytes []byte, resp **http.Response) error {
+func putReq(url string, resp **http.Response) error {
+	username := "kmfddm"
+
+	req, err := http.NewRequest("PUT", url, nil)
+	req.ContentLength = 0
+	auth := username + ":" + viper.GetString("api_key")
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
+	req.Header.Add("Authorization", "Basic "+encodedAuth)
+
+	*resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func putJsonReq(url string, jsonBytes []byte, resp **http.Response) error {
 	username := "kmfddm"
 
 	body := bytes.NewBuffer(jsonBytes)
