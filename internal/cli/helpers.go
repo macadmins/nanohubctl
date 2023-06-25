@@ -90,6 +90,22 @@ func getReq(url string, resp **http.Response) error {
 	return nil
 }
 
+func getReqWithEnrollmentID(url, deviceID string, resp **http.Response) error {
+	username := "kmfddm"
+
+	req, err := http.NewRequest("GET", url, nil)
+	auth := username + ":" + viper.GetString("api_key")
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
+	req.Header.Add("Authorization", "Basic "+encodedAuth)
+	req.Header.Add("X-Enrollment-ID", deviceID)
+
+	*resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func deleteReq(url string, resp **http.Response) error {
 	username := "kmfddm"
 

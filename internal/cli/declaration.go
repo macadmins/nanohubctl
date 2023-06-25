@@ -38,7 +38,7 @@ func declarationCmd() *cobra.Command {
 	return declarationCmd
 }
 
-// createCmd handles creating declarations on the server
+// createDeclarationCmd creates a new declaration based on a JSON file on disk
 func createDeclarationCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "create",
@@ -80,7 +80,7 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	return nil
 }
 
-// getCmd handles getting declarations on the server
+// getDeclarationCmd retrieves a declaration from the server
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "get",
@@ -138,11 +138,11 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	return nil
 }
 
-// getCmd handles getting declarations on the server
+// getSetsDeclarationCmd Lists set membership for a given declaration
 func getSetsDeclarationCmd() *cobra.Command {
 	getSetsCmd := &cobra.Command{
 		Use:     "sets",
-		Short:   fmt.Sprintf("List sList set membership for the specified declarationet membership for the specified declaration"),
+		Short:   fmt.Sprintf("List set membership for a given declaration"),
 		Long:    fmt.Sprintf("List set membership for a given declaration"),
 		PreRunE: applyPreExecFn,
 		RunE:    getSetsDeclarationFn,
@@ -187,7 +187,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	return nil
 }
 
-// getCmd handles getting declarations on the server
+// deleteDeclarationCmd deletes a declaration from the server
 func deleteDeclarationCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete",

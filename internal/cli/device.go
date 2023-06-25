@@ -180,7 +180,7 @@ func removeDeviceFn(cmd *cobra.Command, devices []string) error {
 	return nil
 }
 
-// Handles http for add and remove, probably better to just duplicate the code. Oh well.
+// addOrDeletedeviceItem handles http for add and remove, probably better to just duplicate the code. Oh well.
 func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http.Response, error) {
 	// Device path for the enrollment set
 	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/enrollment-sets", deviceID)

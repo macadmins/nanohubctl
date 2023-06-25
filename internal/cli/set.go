@@ -84,12 +84,12 @@ func getSetFn(cmd *cobra.Command, sets []string) error {
 	return nil
 }
 
-// createCmd handles creating sets on the server
+// addSetCmd adds a declaration to a given set
 func addSetCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "add",
-		Short:   fmt.Sprintf("create a set"),
-		Long:    fmt.Sprintf("create a set"),
+		Short:   fmt.Sprintf("Add a declaration to a set"),
+		Long:    fmt.Sprintf("Add a declaration to a set"),
 		PreRunE: applyPreExecFn,
 		RunE:    addSetFn,
 	}
@@ -132,12 +132,12 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 	return nil
 }
 
-// getCmd handles getting sets on the server
+// deleteSetCmd deletes a declaration from a given set
 func deleteSetCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete",
-		Short:   fmt.Sprintf("delete a set"),
-		Long:    fmt.Sprintf("delete a set"),
+		Short:   fmt.Sprintf("Delete a declaration from a set"),
+		Long:    fmt.Sprintf("Delete a declaration from a set"),
 		PreRunE: applyPreExecFn,
 		RunE:    deleteSetFn,
 	}
@@ -181,6 +181,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 	return nil
 }
 
+// addOrDeleteSetItem handles http for add and remove, probably better to just duplicate the code.
 func addOrDeleteSetItem(action, name, identifier string, ddmUrl *url.URL) (*http.Response, error) {
 	// Set the path
 	ddmUrl.Path = path.Join(ddmUrl.Path, "/v1/set-declarations/", name)
