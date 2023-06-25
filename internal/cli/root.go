@@ -60,7 +60,7 @@ func rootCmd() *cobra.Command {
 	rootCmd.AddCommand(
 		declarationCmd(),
 		setCmd(),
-		// statuCmd(),
+		statusCmd(),
 	)
 
 	return rootCmd

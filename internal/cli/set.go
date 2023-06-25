@@ -95,8 +95,7 @@ func addSetCmd() *cobra.Command {
 
 	createCmd.Flags().StringP("name", "n", "", "Name of the set to add item to")
 	createCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to add to the set")
-	createCmd.MarkFlagRequired("name")
-	createCmd.MarkFlagRequired("identifier")
+	createCmd.MarkFlagsRequiredTogether("name", "identifier")
 
 	return createCmd
 }
