@@ -38,12 +38,12 @@ func statusCmd() *cobra.Command {
 	return statusCmd
 }
 
-// getCmd handles getting statuss on the server
+// declarationStatusCmd lists declarations for a specified device ID
 func declarationStatusCmd() *cobra.Command {
 	declarationStatusCmd := &cobra.Command{
 		Use:     "declarations",
-		Short:   fmt.Sprintf("List declarations for a specified enrollment ID"),
-		Long:    fmt.Sprintf("List declarations for a specified enrollment ID"),
+		Short:   fmt.Sprintf("List declarations for a specified device ID"),
+		Long:    fmt.Sprintf("List declarations for a specified device ID"),
 		PreRunE: applyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -51,12 +51,12 @@ func declarationStatusCmd() *cobra.Command {
 	return declarationStatusCmd
 }
 
-// getCmd handles getting statuss on the server
+// errorsCmd Lists errors for a specified device ID
 func errorsCmd() *cobra.Command {
 	errorsCmd := &cobra.Command{
 		Use:     "errors",
-		Short:   fmt.Sprintf("List errors for a specified enrollment ID"),
-		Long:    fmt.Sprintf("List errors for a specified enrollment ID"),
+		Short:   fmt.Sprintf("List errors for a specified device ID"),
+		Long:    fmt.Sprintf("List errors for a specified device ID"),
 		PreRunE: applyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -64,12 +64,12 @@ func errorsCmd() *cobra.Command {
 	return errorsCmd
 }
 
-// getCmd handles getting statuss on the server
+// valuesCmd lists all values for a specified device ID
 func valuesCmd() *cobra.Command {
 	valuesCmd := &cobra.Command{
 		Use:     "values",
-		Short:   fmt.Sprintf("List values for a specified enrollment ID"),
-		Long:    fmt.Sprintf("List values for a specified enrollment ID"),
+		Short:   fmt.Sprintf("List values for a specified device ID"),
+		Long:    fmt.Sprintf("List values for a specified device ID"),
 		PreRunE: applyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -77,9 +77,9 @@ func valuesCmd() *cobra.Command {
 	return valuesCmd
 }
 
+// StatusFn handles all logic for the various status commands
 func StatusFn(cmd *cobra.Command, statuss []string) error {
 	clientID, err := cmd.Flags().GetString("ID")
-	// fmt.Println(cmd.Use)
 	if err != nil {
 		return err
 	}
