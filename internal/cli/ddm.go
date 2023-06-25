@@ -38,7 +38,7 @@ func ddmCmd() *cobra.Command {
 	return ddmCmd
 }
 
-// declarationddmCmd lists declarations for a specified device ID
+// tokenDdmCmd shows the ddm token for a given device ID
 func tokenDdmCmd() *cobra.Command {
 	tokenDdmCmd := &cobra.Command{
 		Use:     "token",
@@ -51,7 +51,7 @@ func tokenDdmCmd() *cobra.Command {
 	return tokenDdmCmd
 }
 
-// errorsCmd Lists errors for a specified device ID
+// declarationsDdmCmd shows all declaration items for a given device ID from the ddm endpoint
 func declarationsDdmCmd() *cobra.Command {
 	declarationsDdmCmd := &cobra.Command{
 		Use:     "declarations",
@@ -64,7 +64,7 @@ func declarationsDdmCmd() *cobra.Command {
 	return declarationsDdmCmd
 }
 
-// valuesCmd lists all values for a specified device ID
+// getDeclarationDdmCmd gets a specific declaration type about a given device ID from the ddm endpoint
 func getDeclarationDdmCmd() *cobra.Command {
 	getDeclarationDdmCmd := &cobra.Command{
 		Use:     "declaration",
@@ -83,7 +83,7 @@ func getDeclarationDdmCmd() *cobra.Command {
 	return getDeclarationDdmCmd
 }
 
-// ddmFn handles all logic for the various ddm commands
+// getDeclarationDdmFn handles the declaration ddm endpoint
 func getDeclarationDdmFn(cmd *cobra.Command, ddms []string) error {
 	deviceID, err := cmd.Flags().GetString("ID")
 	if err != nil {
