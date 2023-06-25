@@ -32,6 +32,7 @@ func declarationCmd() *cobra.Command {
 		createDeclarationCmd(),
 		getDeclarationCmd(),
 		deleteDeclarationCmd(),
+		getSetsDeclarationCmd(),
 	)
 
 	return declarationCmd
@@ -41,8 +42,8 @@ func declarationCmd() *cobra.Command {
 func createDeclarationCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "create",
-		Short:   fmt.Sprintf("create a declaration"),
-		Long:    fmt.Sprintf("create a declaration"),
+		Short:   fmt.Sprintf("Create a declaration"),
+		Long:    fmt.Sprintf("Create a declaration"),
 		PreRunE: applyPreExecFn,
 		RunE:    createDeclarationFn,
 	}
@@ -83,8 +84,8 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "get",
-		Short:   fmt.Sprintf("get a declaration"),
-		Long:    fmt.Sprintf("get a declaration"),
+		Short:   fmt.Sprintf("Get declaration details"),
+		Long:    fmt.Sprintf("Get declaration details"),
 		PreRunE: applyPreExecFn,
 		RunE:    getDeclarationFn,
 	}
@@ -138,11 +139,60 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 }
 
 // getCmd handles getting declarations on the server
+func getSetsDeclarationCmd() *cobra.Command {
+	getSetsCmd := &cobra.Command{
+		Use:     "sets",
+		Short:   fmt.Sprintf("List sList set membership for the specified declarationet membership for the specified declaration"),
+		Long:    fmt.Sprintf("List set membership for a given declaration"),
+		PreRunE: applyPreExecFn,
+		RunE:    getSetsDeclarationFn,
+	}
+
+	getSetsCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
+	getSetsCmd.MarkFlagRequired("identifier")
+
+	return getSetsCmd
+}
+
+func getSetsDeclarationFn(cmd *cobra.Command, declarations []string) error {
+	// ToDo(natewalck) - Check to see if identifier exists before getting sets for it
+	identifier, err := cmd.Flags().GetString("identifier")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Getting set membership for identifier %s\n", identifier)
+	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl.Path = path.Join(ddmUrl.Path, "/v1/declaration-sets", identifier)
+	if err != nil {
+		return err
+	}
+	var resp *http.Response
+	err = getReq(ddmUrl.String(), &resp)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println(resp.Status)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	// Could be an array of strings or a proper dictionary
+	var jsonResponse []string
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
+		return err
+	}
+	fmt.Println(PrettyJsonPrint(jsonResponse))
+	return nil
+}
+
+// getCmd handles getting declarations on the server
 func deleteDeclarationCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete",
-		Short:   fmt.Sprintf("delete a declaration"),
-		Long:    fmt.Sprintf("delete a declaration"),
+		Short:   fmt.Sprintf("Delete a declaration"),
+		Long:    fmt.Sprintf("Delete a declaration"),
 		PreRunE: applyPreExecFn,
 		RunE:    deleteDeclarationFn,
 	}
