@@ -90,7 +90,9 @@ func getDeclarationCmd() *cobra.Command {
 	}
 
 	getCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
-	getCmd.MarkFlagRequired("identifier")
+	getCmd.Flags().BoolP("all", "a", false, "Identifier of the declaration to retrieve")
+	// We can only retrieve a single declaration or all of them
+	getCmd.MarkFlagsMutuallyExclusive("identifier", "all")
 
 	return getCmd
 }
@@ -100,12 +102,20 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Getting declaration for identifier %s\n", identifier)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
+	fmt.Printf("Getting declaration for identifier %s\n", identifier)
+	ddmUrl, err := url.Parse(viper.GetString("url"))
+	if all {
+		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
+	} else {
+		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
+	}
+	if err != nil {
+		return err
+	}
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -118,7 +128,8 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 		return err
 	}
 	resp.Body.Close()
-	var jsonResponse map[string]interface{}
+	// Could be an array of strings or a proper dictionary
+	var jsonResponse interface{}
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
