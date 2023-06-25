@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// setCmd handles creation and management of declaration sets
 func setCmd() *cobra.Command {
 	setCmd := &cobra.Command{
 		Use:     "set",

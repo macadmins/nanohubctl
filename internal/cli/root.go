@@ -61,6 +61,7 @@ func rootCmd() *cobra.Command {
 		declarationCmd(),
 		setCmd(),
 		statusCmd(),
+		deviceCmd(),
 	)
 
 	return rootCmd
