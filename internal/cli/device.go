@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// deviceCmd handles creation and management of declaration devices
+// deviceCmd manages set membership for a given device
 func deviceCmd() *cobra.Command {
 	deviceCmd := &cobra.Command{
 		Use:     "device",
@@ -40,7 +40,7 @@ func deviceCmd() *cobra.Command {
 	return deviceCmd
 }
 
-// getCmd handles getting devices on the server
+// getDeviceCmd retreives all sets applied to a given device
 func getDeviceCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "sets",
@@ -85,7 +85,7 @@ func getdeviceFn(cmd *cobra.Command, devices []string) error {
 	return nil
 }
 
-// createCmd handles creating devices on the server
+// applyDeviceCmd applies a given set to the provided device ID
 func applyDeviceCmd() *cobra.Command {
 	applyDeviceCmd := &cobra.Command{
 		Use:     "apply",
@@ -132,7 +132,7 @@ func applyDeviceFn(cmd *cobra.Command, devices []string) error {
 	return nil
 }
 
-// getCmd handles getting devices on the server
+// removeDeviceCmd removes a specified device ID from a given set
 func removeDeviceCmd() *cobra.Command {
 	removeDeviceCmd := &cobra.Command{
 		Use:     "remove",
@@ -180,6 +180,7 @@ func removeDeviceFn(cmd *cobra.Command, devices []string) error {
 	return nil
 }
 
+// Handles http for add and remove, probably better to just duplicate the code. Oh well.
 func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http.Response, error) {
 	// Device path for the enrollment set
 	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/enrollment-sets", deviceID)
