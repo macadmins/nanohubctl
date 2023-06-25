@@ -225,6 +225,5 @@ func deleteDeclarationFn(cmd *cobra.Command, declarations []string) error {
 		log.Fatalln(err)
 	}
 	fmt.Println(string(body))
-	fmt.Println(resp.Status)
 	return nil
 }
