@@ -29,6 +29,7 @@ func setCmd() *cobra.Command {
 		},
 	}
 	setCmd.AddCommand(
+		listSetsCmd(),
 		addSetCmd(),
 		getSetCmd(),
 		deleteSetCmd(),
@@ -37,28 +38,62 @@ func setCmd() *cobra.Command {
 	return setCmd
 }
 
+// listSetsCmd handles getting sets on the server
+func listSetsCmd() *cobra.Command {
+	listCmd := &cobra.Command{
+		Use:     "list",
+		Short:   fmt.Sprintf("list all sets"),
+		Long:    fmt.Sprintf("list all sets"),
+		PreRunE: applyPreExecFn,
+		RunE:    listSetsFn,
+	}
+
+	return listCmd
+}
+
+func listSetsFn(cmd *cobra.Command, args []string) error {
+	fmt.Printf("Listing all available sets\n")
+	ddmUrl, err := url.Parse(viper.GetString("url"))
+	if err != nil {
+		return err
+	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/sets")
+	var resp *http.Response
+	err = getReq(ddmUrl.String(), &resp)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	var jsonResponse []string
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
+		return err
+	}
+	fmt.Println(PrettyJsonPrint(jsonResponse))
+	return nil
+}
+
 // getCmd handles getting sets on the server
 func getSetCmd() *cobra.Command {
 	getCmd := &cobra.Command{
-		Use:     "get",
-		Short:   fmt.Sprintf("get a set"),
-		Long:    fmt.Sprintf("get a set"),
+		Use:     "get [set name]",
+		Short:   fmt.Sprintf("Get the declarations for a set"),
+		Long:    fmt.Sprintf("Get the declarations for a set"),
+		Args:    cobra.MinimumNArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    getSetFn,
 	}
 
-	getCmd.Flags().StringP("name", "n", "", "Name of the set to retrieve")
-	getCmd.MarkFlagRequired("name")
-
 	return getCmd
 }
 
-func getSetFn(cmd *cobra.Command, sets []string) error {
-	name, err := cmd.Flags().GetString("name")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Getting set for identifier %s\n", name)
+func getSetFn(cmd *cobra.Command, args []string) error {
+	name := args[0]
+	fmt.Printf("Getting set for identifier %s\n\n", name)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -70,7 +105,6 @@ func getSetFn(cmd *cobra.Command, sets []string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp.Status)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -79,6 +113,10 @@ func getSetFn(cmd *cobra.Command, sets []string) error {
 	var jsonResponse []string
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
+	}
+	if jsonResponse == nil {
+		fmt.Println("No declarations found")
+		return nil
 	}
 	fmt.Println(PrettyJsonPrint(jsonResponse))
 	return nil
@@ -107,7 +145,7 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Adding %s to set %s...\n", identifier, name)
+	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -119,7 +157,7 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 	if resp.StatusCode == http.StatusNotModified {
 		fmt.Printf("%s is already in %s", identifier, name)
 	} else if resp.StatusCode == http.StatusNoContent {
-		fmt.Printf("%s has been added to %s", identifier, name)
+		fmt.Printf("%s has been added to set: %s", identifier, name)
 	} else {
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)
@@ -156,7 +194,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Adding %s to set %s...\n", identifier, name)
+	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -168,7 +206,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 	if resp.StatusCode == http.StatusNotModified {
 		fmt.Printf("%s does not exist in %s", identifier, name)
 	} else if resp.StatusCode == http.StatusNoContent {
-		fmt.Printf("%s has been removed from %s", identifier, name)
+		fmt.Printf("%s has been removed from set: %s", identifier, name)
 	} else {
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)

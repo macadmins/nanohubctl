@@ -51,6 +51,7 @@ func rootCmd() *cobra.Command {
 	}
 
 	// Set up ENV namespace and ENV vars
+	// All env vars will be prefixed with DDM
 	viper.SetEnvPrefix("DDM")
 	viper.BindEnv("URL")
 	viper.BindEnv("API_KEY")
@@ -58,11 +59,11 @@ func rootCmd() *cobra.Command {
 
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
-		declarationCmd(),
+		// declarationCmd(),
 		setCmd(),
 		statusCmd(),
 		deviceCmd(),
-		ddmCmd(),
+		// ddmCmd(),
 	)
 
 	return rootCmd

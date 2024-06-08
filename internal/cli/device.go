@@ -28,11 +28,9 @@ func deviceCmd() *cobra.Command {
 			return nil
 		},
 	}
-	deviceCmd.PersistentFlags().StringP("ID", "i", "", "Identifier of the client to return status for")
-	deviceCmd.MarkPersistentFlagRequired("ID")
 
 	deviceCmd.AddCommand(
-		applyDeviceCmd(),
+		addDeviceCmd(),
 		getDeviceCmd(),
 		removeDeviceCmd(),
 	)
@@ -44,23 +42,17 @@ func deviceCmd() *cobra.Command {
 func getDeviceCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "sets",
-		Short:   fmt.Sprintf("Get a list of all sets a device has applied to it"),
-		Long:    fmt.Sprintf("Get a list of all sets a device has applied to it"),
+		Short:   fmt.Sprintf("Get a list of all sets for a given device"),
+		Long:    fmt.Sprintf("Get a list of all sets for a given device"),
 		PreRunE: applyPreExecFn,
 		RunE:    getdeviceFn,
 	}
 
-	// getCmd.Flags().StringP("ID", "i", "", "Name of the device to retrieve")
-	// getCmd.MarkFlagRequired("ID ")
-
 	return getCmd
 }
 
-func getdeviceFn(cmd *cobra.Command, devices []string) error {
-	deviceID, err := cmd.Flags().GetString("ID")
-	if err != nil {
-		return err
-	}
+func getdeviceFn(cmd *cobra.Command, args []string) error {
+	deviceID := viper.GetString("client_id")
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -85,35 +77,31 @@ func getdeviceFn(cmd *cobra.Command, devices []string) error {
 	return nil
 }
 
-// applyDeviceCmd applies a given set to the provided device ID
-func applyDeviceCmd() *cobra.Command {
-	applyDeviceCmd := &cobra.Command{
-		Use:     "apply",
-		Short:   fmt.Sprintf("Apply a declaration set to a device"),
-		Long:    fmt.Sprintf("Apply a declaration set to a device"),
+// addDeviceCmd applies a given set to the provided device ID
+func addDeviceCmd() *cobra.Command {
+	addDeviceCmd := &cobra.Command{
+		Use:     "add",
+		Short:   fmt.Sprintf("Add a device to a declaration set"),
+		Long:    fmt.Sprintf("Add a device to a declaration set"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
-		RunE:    applyDeviceFn,
+		RunE:    addDeviceFn,
 	}
 
-	applyDeviceCmd.Flags().StringP("set", "s", "", "Name of the set to apply to the device")
-	applyDeviceCmd.Flags().StringP("ID", "i", "", "Enrollment ID of the device")
-	applyDeviceCmd.MarkFlagsRequiredTogether("set", "ID")
-
-	return applyDeviceCmd
+	return addDeviceCmd
 }
 
-func applyDeviceFn(cmd *cobra.Command, devices []string) error {
-	set, err := cmd.Flags().GetString("set")
-	deviceID, err := cmd.Flags().GetString("ID")
-	if err != nil {
-		return err
-	}
+func addDeviceFn(cmd *cobra.Command, args []string) error {
+	deviceID := viper.GetString("client_id")
+
+	set := args[0]
+
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
 	}
 
-	resp, err := addOrDeletedeviceItem("apply", deviceID, set, ddmUrl)
+	resp, err := addOrDeletedeviceItem("add", deviceID, set, ddmUrl)
 
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotModified {
@@ -136,26 +124,22 @@ func applyDeviceFn(cmd *cobra.Command, devices []string) error {
 func removeDeviceCmd() *cobra.Command {
 	removeDeviceCmd := &cobra.Command{
 		Use:     "remove",
-		Short:   fmt.Sprintf("Remove a declaration set from a device"),
-		Long:    fmt.Sprintf("Remove a declaration set from a device"),
+		Short:   fmt.Sprintf("Remove a device from a declaration set"),
+		Long:    fmt.Sprintf("Remove a device from a declaration set"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    removeDeviceFn,
 	}
 
-	removeDeviceCmd.Flags().StringP("set", "s", "", "Name of the set to apply to the device")
-	removeDeviceCmd.Flags().StringP("ID", "i", "", "Enrollment ID of the device")
-	removeDeviceCmd.MarkFlagsRequiredTogether("set", "ID")
-
 	return removeDeviceCmd
 }
 
-func removeDeviceFn(cmd *cobra.Command, devices []string) error {
-	deviceID, err := cmd.Flags().GetString("ID")
-	set, err := cmd.Flags().GetString("set")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Adding %s to device %s...\n", deviceID, set)
+func removeDeviceFn(cmd *cobra.Command, args []string) error {
+	deviceID := viper.GetString("client_id")
+
+	set := args[0]
+
+	fmt.Printf("Adding device %s to set %s...\n", deviceID, set)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -165,11 +149,13 @@ func removeDeviceFn(cmd *cobra.Command, devices []string) error {
 
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotModified {
-		fmt.Printf("%s does not exist in %s", deviceID, set)
+		fmt.Printf("%s is not in set: %s\n", deviceID, set)
 	} else if resp.StatusCode == http.StatusNoContent {
 		fmt.Printf("%s has been removed from %s", deviceID, set)
 	} else {
-		fmt.Println(resp.Status)
+		if resp.StatusCode == http.StatusInternalServerError {
+			return fmt.Errorf("Set does not exist\n")
+		}
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalln(err)
@@ -188,10 +174,9 @@ func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http
 	q := ddmUrl.Query()
 	q.Set("set", set)
 	ddmUrl.RawQuery = q.Encode()
-	fmt.Println(ddmUrl.String())
 	var resp *http.Response
 	var respErr error
-	if action == "apply" {
+	if action == "add" {
 		respErr = putReq(ddmUrl.String(), &resp)
 	} else if action == "remove" {
 		respErr = deleteReq(ddmUrl.String(), &resp)

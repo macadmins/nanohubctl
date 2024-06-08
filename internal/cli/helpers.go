@@ -31,7 +31,10 @@ func applyPreExecFn(cmd *cobra.Command, args []string) error {
 	if err := viper.BindPFlag("client_id", cmd.Flags().Lookup("client_id")); err != nil {
 		return errors.New("failed to bind id to viper")
 	}
-
+	clientUUID := viper.GetString("client_id")
+	if !validUUID(clientUUID) {
+		return errors.New("Invalid UUID provided")
+	}
 	// Make sure mandatory values are present before continuing
 	if viper.GetString("URL") == "" {
 		return errors.New("Base Url must be provided!")
@@ -124,4 +127,12 @@ func deleteReq(url string, resp **http.Response) error {
 func PrettyJsonPrint(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
+}
+
+func validUUID(uuid string) bool {
+	// apnsRequest := "https://mdm1.macadmins.io/v1/push/$ID"
+	if len(uuid) != 36 {
+		return false
+	}
+	return true
 }
