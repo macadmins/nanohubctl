@@ -108,15 +108,28 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	jsonResponse, err := getDeclarationCall(ddmUrl)
+	var resp *http.Response
+	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	// Could be an array of strings or a proper dictionary
+	var jsonResponse interface{}
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
 	fmt.Println(PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
-func getDeclarationCall(ddmUrl *url.URL) ([]string, error) {
+// Get all declarations from the server
+func getAllDeclarations(ddmUrl *url.URL) ([]string, error) {
 	var resp *http.Response
 	err := getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -158,7 +171,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "v1/declarations")
-	allDecls, nil := getDeclarationCall(ddmGetDeclsUrl)
+	allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
 	if !slices.Contains(allDecls, identifier) {
 		return fmt.Errorf("%s is not a valid declaration", identifier)
 	}
