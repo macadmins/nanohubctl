@@ -131,8 +131,8 @@ func PrettyJsonPrint(i interface{}) string {
 
 func validUUID(uuid string) bool {
 	// apnsRequest := "https://mdm1.macadmins.io/v1/push/$ID"
-	if len(uuid) != 36 {
-		return false
+	if len(uuid) == 36 || len(uuid) == 25 {
+		return true
 	}
-	return true
+	return false
 }
