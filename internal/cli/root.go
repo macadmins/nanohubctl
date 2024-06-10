@@ -60,7 +60,7 @@ func rootCmd() *cobra.Command {
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
 		// ToDo - revise declaration command and uncomment
-		// declarationCmd(),
+		declarationCmd(),
 		setCmd(),
 		deviceCmd(),
 		// ToDo - revise ddm command and uncomment

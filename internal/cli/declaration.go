@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"slices"
 
 	"net/http"
 	"net/url"
@@ -29,9 +30,9 @@ func declarationCmd() *cobra.Command {
 		},
 	}
 	declarationCmd.AddCommand(
-		createDeclarationCmd(),
+		// createDeclarationCmd(),
 		getDeclarationCmd(),
-		deleteDeclarationCmd(),
+		// deleteDeclarationCmd(),
 		getSetsDeclarationCmd(),
 	)
 
@@ -83,33 +84,23 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 // getDeclarationCmd retrieves a declaration from the server
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
-		Use:     "get",
-		Short:   fmt.Sprintf("Get declaration details"),
-		Long:    fmt.Sprintf("Get declaration details"),
+		Use:     "get [ declaration identifier | all ]",
+		Short:   fmt.Sprintf("Get declaration details for identifier"),
+		Long:    fmt.Sprintf("Get declaration details for identifier or a list of all declaration"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    getDeclarationFn,
 	}
 
-	getCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
-	getCmd.Flags().BoolP("all", "a", false, "Identifier of the declaration to retrieve")
-	// We can only retrieve a single declaration or all of them
-	getCmd.MarkFlagsMutuallyExclusive("identifier", "all")
-
 	return getCmd
 }
 
-func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
-	identifier, err := cmd.Flags().GetString("identifier")
-	if err != nil {
-		return err
-	}
-	all, err := cmd.Flags().GetBool("all")
-	if err != nil {
-		return err
-	}
+func getDeclarationFn(cmd *cobra.Command, args []string) error {
+	identifier := args[0]
+
 	fmt.Printf("Getting declaration for identifier %s\n", identifier)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
-	if all {
+	if identifier == "all" {
 		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
 	} else {
 		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
@@ -123,7 +114,6 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp.Status)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -138,28 +128,54 @@ func getDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	return nil
 }
 
+// Get all declarations from the server
+func getAllDeclarations(ddmUrl *url.URL) ([]string, error) {
+	var resp *http.Response
+	err := getReq(ddmUrl.String(), &resp)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	resp.Body.Close()
+	// Could be an array of strings or a proper dictionary
+	var jsonResponse []string
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
+		return nil, err
+	}
+	return jsonResponse, nil
+}
+
 // getSetsDeclarationCmd Lists set membership for a given declaration
 func getSetsDeclarationCmd() *cobra.Command {
 	getSetsCmd := &cobra.Command{
 		Use:     "sets",
 		Short:   fmt.Sprintf("List set membership for a given declaration"),
 		Long:    fmt.Sprintf("List set membership for a given declaration"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    getSetsDeclarationFn,
 	}
 
-	getSetsCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
-	getSetsCmd.MarkFlagRequired("identifier")
-
 	return getSetsCmd
 }
 
-func getSetsDeclarationFn(cmd *cobra.Command, declarations []string) error {
-	// ToDo(natewalck) - Check to see if identifier exists before getting sets for it
-	identifier, err := cmd.Flags().GetString("identifier")
+func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
+	identifier := args[0]
+
+	ddmGetDeclsUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
 	}
+	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "v1/declarations")
+	allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
+	if !slices.Contains(allDecls, identifier) {
+		return fmt.Errorf("%s is not a valid declaration", identifier)
+	}
+
 	fmt.Printf("Getting set membership for identifier %s\n", identifier)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	ddmUrl.Path = path.Join(ddmUrl.Path, "/v1/declaration-sets", identifier)
@@ -172,7 +188,6 @@ func getSetsDeclarationFn(cmd *cobra.Command, declarations []string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp.Status)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
