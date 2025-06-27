@@ -70,7 +70,7 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
+	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
 	var resp *http.Response
 	err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
 	if err != nil {
@@ -84,9 +84,9 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 // getDeclarationCmd retrieves a declaration from the server
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
-		Use:     "get [ declaration identifier | all ]",
+		Use:     "get [ declaration identifier ]",
 		Short:   fmt.Sprintf("Get declaration details for identifier"),
-		Long:    fmt.Sprintf("Get declaration details for identifier or a list of all declaration"),
+		Long:    fmt.Sprintf("Get declaration details for identifier"),
 		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    getDeclarationFn,
@@ -100,11 +100,7 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Getting declaration for identifier %s\n", identifier)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
-	if identifier == "all" {
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations")
-	} else {
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
-	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations", identifier)
 	if err != nil {
 		return err
 	}
@@ -128,27 +124,6 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// Get all declarations from the server
-func getAllDeclarations(ddmUrl *url.URL) ([]string, error) {
-	var resp *http.Response
-	err := getReq(ddmUrl.String(), &resp)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	resp.Body.Close()
-	// Could be an array of strings or a proper dictionary
-	var jsonResponse []string
-	if err := json.Unmarshal(body, &jsonResponse); err != nil {
-		return nil, err
-	}
-	return jsonResponse, nil
-}
-
 // getSetsDeclarationCmd Lists set membership for a given declaration
 func getSetsDeclarationCmd() *cobra.Command {
 	getSetsCmd := &cobra.Command{
@@ -170,7 +145,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "v1/declarations")
+	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "declarations")
 	allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
 	if !slices.Contains(allDecls, identifier) {
 		return fmt.Errorf("%s is not a valid declaration", identifier)
@@ -178,7 +153,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Getting set membership for identifier %s\n", identifier)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
-	ddmUrl.Path = path.Join(ddmUrl.Path, "/v1/declaration-sets", identifier)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "/declaration-sets", identifier)
 	if err != nil {
 		return err
 	}
@@ -228,7 +203,7 @@ func deleteDeclarationFn(cmd *cobra.Command, declarations []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declarations", identifier)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations", identifier)
 	var resp *http.Response
 	err = deleteReq(ddmUrl.String(), &resp)
 	if err != nil {

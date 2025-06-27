@@ -57,7 +57,7 @@ func listSetsFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/sets")
+	ddmUrl.Path = path.Join(ddmUrl.Path, "sets")
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -98,7 +98,7 @@ func getSetFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/set-declarations", name)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "set-declarations", name)
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -222,7 +222,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 // addOrDeleteSetItem handles http for add and remove, probably better to just duplicate the code.
 func addOrDeleteSetItem(action, name, identifier string, ddmUrl *url.URL) (*http.Response, error) {
 	// Set the path
-	ddmUrl.Path = path.Join(ddmUrl.Path, "/v1/set-declarations/", name)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "/set-declarations/", name)
 	// Add the query arguments
 	q := ddmUrl.Query()
 	q.Set("declaration", identifier)

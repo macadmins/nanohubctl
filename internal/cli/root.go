@@ -42,6 +42,7 @@ func rootCmd() *cobra.Command {
 	// At the rootCmd level, set these global flags that will be available to downstream cmds
 	rootCmd.PersistentFlags().String("url", "", "URL of the ddm instance")
 	rootCmd.PersistentFlags().String("api_key", "", "API key for the ddm instance")
+	rootCmd.PersistentFlags().String("api_user", "nanohub", "API key for the ddm instance")
 	rootCmd.PersistentFlags().String("client_id", "", "Client ID to apply items to")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Run in debug mode")
 	rootCmd.PersistentFlags().BoolVar(&vv, "vv", false, "Run in verbose logging mode")
@@ -55,11 +56,12 @@ func rootCmd() *cobra.Command {
 	viper.SetEnvPrefix("DDM")
 	viper.BindEnv("URL")
 	viper.BindEnv("API_KEY")
+	viper.BindEnv("API_USER")
 	viper.BindEnv("CLIENT_ID")
 
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
-		// ToDo - revise declaration command and uncomment
+		declarationsCmd(),
 		declarationCmd(),
 		setCmd(),
 		deviceCmd(),

@@ -31,9 +31,12 @@ func applyPreExecFn(cmd *cobra.Command, args []string) error {
 	if err := viper.BindPFlag("client_id", cmd.Flags().Lookup("client_id")); err != nil {
 		return errors.New("failed to bind id to viper")
 	}
-	clientUUID := viper.GetString("client_id")
-	if !validUUID(clientUUID) {
-		return errors.New("Invalid UUID provided")
+	// If declaration or declarations is called, skip the UUID check
+	if !(cmd.Name() == "declarations" || cmd.Name() == "declaration" || cmd.Parent().Name() == "declaration") {
+		clientUUID := viper.GetString("client_id")
+		if !validUUID(clientUUID) {
+			return errors.New("Invalid UUID provided")
+		}
 	}
 	// Make sure mandatory values are present before continuing
 	if viper.GetString("URL") == "" {
@@ -47,11 +50,9 @@ func applyPreExecFn(cmd *cobra.Command, args []string) error {
 }
 
 func putReq(url string, resp **http.Response) error {
-	username := "kmfddm"
-
 	req, err := http.NewRequest("PUT", url, nil)
 	req.ContentLength = 0
-	auth := username + ":" + viper.GetString("api_key")
+	auth := viper.GetString("api_user") + ":" + viper.GetString("api_key")
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+encodedAuth)
 
@@ -63,11 +64,9 @@ func putReq(url string, resp **http.Response) error {
 }
 
 func putJsonReq(url string, jsonBytes []byte, resp **http.Response) error {
-	username := "kmfddm"
-
 	body := bytes.NewBuffer(jsonBytes)
 	req, err := http.NewRequest("PUT", url, body)
-	auth := username + ":" + viper.GetString("api_key")
+	auth := viper.GetString("api_user") + ":" + viper.GetString("api_key")
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+encodedAuth)
 
@@ -79,10 +78,8 @@ func putJsonReq(url string, jsonBytes []byte, resp **http.Response) error {
 }
 
 func getReq(url string, resp **http.Response) error {
-	username := "kmfddm"
-
 	req, err := http.NewRequest("GET", url, nil)
-	auth := username + ":" + viper.GetString("api_key")
+	auth := viper.GetString("api_user") + ":" + viper.GetString("api_key")
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+encodedAuth)
 
@@ -94,10 +91,8 @@ func getReq(url string, resp **http.Response) error {
 }
 
 func getReqWithEnrollmentID(url, deviceID string, resp **http.Response) error {
-	username := "kmfddm"
-
 	req, err := http.NewRequest("GET", url, nil)
-	auth := username + ":" + viper.GetString("api_key")
+	auth := viper.GetString("api_user") + ":" + viper.GetString("api_key")
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+encodedAuth)
 	req.Header.Add("X-Enrollment-ID", deviceID)
@@ -110,10 +105,8 @@ func getReqWithEnrollmentID(url, deviceID string, resp **http.Response) error {
 }
 
 func deleteReq(url string, resp **http.Response) error {
-	username := "kmfddm"
-
 	req, err := http.NewRequest("DELETE", url, nil)
-	auth := username + ":" + viper.GetString("api_key")
+	auth := viper.GetString("api_user") + ":" + viper.GetString("api_key")
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+encodedAuth)
 
@@ -130,7 +123,6 @@ func PrettyJsonPrint(i interface{}) string {
 }
 
 func validUUID(uuid string) bool {
-	// apnsRequest := "https://mdm1.macadmins.io/v1/push/$ID"
 	if len(uuid) == 36 || len(uuid) == 25 {
 		return true
 	}

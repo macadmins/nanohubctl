@@ -61,7 +61,7 @@ func getdeviceFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/enrollment-sets", deviceID)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "enrollment-sets", deviceID)
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -173,7 +173,7 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 // addOrDeletedeviceItem handles http for add and remove, probably better to just duplicate the code. Oh well.
 func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http.Response, error) {
 	// Device path for the enrollment set
-	ddmUrl.Path = path.Join(ddmUrl.Path, "v1/enrollment-sets", deviceID)
+	ddmUrl.Path = path.Join(ddmUrl.Path, "enrollment-sets", deviceID)
 	// Add the query arguments
 	q := ddmUrl.Query()
 	q.Set("set", set)
@@ -239,11 +239,11 @@ func StatusFn(cmd *cobra.Command, statuss []string) error {
 	cmdVerb := strings.Split(cmd.Use, " ")[0]
 	switch cmdVerb {
 	case "declarations":
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/declaration-status", clientID)
+		ddmUrl.Path = path.Join(ddmUrl.Path, "declaration-status", clientID)
 	case "values":
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/status-values", clientID)
+		ddmUrl.Path = path.Join(ddmUrl.Path, "status-values", clientID)
 	case "errors":
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/status-errors", clientID)
+		ddmUrl.Path = path.Join(ddmUrl.Path, "status-errors", clientID)
 	default:
 		return fmt.Errorf("%s is not a valid status type", cmdVerb)
 	}

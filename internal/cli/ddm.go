@@ -137,7 +137,7 @@ func ddmFn(cmd *cobra.Command, ddms []string) error {
 	case "declarations":
 		ddmUrl.Path = path.Join(ddmUrl.Path, "declaration-items")
 	case "errors":
-		ddmUrl.Path = path.Join(ddmUrl.Path, "v1/ddm-errors", deviceID)
+		ddmUrl.Path = path.Join(ddmUrl.Path, "ddm-errors", deviceID)
 	default:
 		return fmt.Errorf("%s is not a valid ddm type", cmd.Use)
 	}
