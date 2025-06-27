@@ -14,7 +14,7 @@ var (
 	debug bool
 	vv    bool
 
-	version string = "0.0.4"
+	version string = "0.0.5"
 )
 
 func ExecuteWithContext(ctx context.Context) error {
