@@ -46,10 +46,21 @@ func rootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().String("client_id", "", "Client ID to apply items to")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Run in debug mode")
 	rootCmd.PersistentFlags().BoolVar(&vv, "vv", false, "Run in verbose logging mode")
-
 	if vv {
 		logger.SetLevel(2)
 	}
+
+	// Viper has an order of precedence for settings:
+	// 1. PFlags
+	// 2. ENV vars
+	// 3. If both Flag and Env var are set, flag wins
+	// 4. Defaults
+
+	// Bind PFlags to viper settings
+	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
+	viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api_key"))
+	viper.BindPFlag("api_user", rootCmd.PersistentFlags().Lookup("api_user"))
+	viper.BindPFlag("client_id", rootCmd.PersistentFlags().Lookup("client_id"))
 
 	// Set up ENV namespace and ENV vars
 	// All env vars will be prefixed with DDM
@@ -58,6 +69,9 @@ func rootCmd() *cobra.Command {
 	viper.BindEnv("API_KEY")
 	viper.BindEnv("API_USER")
 	viper.BindEnv("CLIENT_ID")
+
+	// Set defaults
+	viper.SetDefault("api_user", "nanohub")
 
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
