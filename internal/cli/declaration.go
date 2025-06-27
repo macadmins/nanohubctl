@@ -30,9 +30,9 @@ func declarationCmd() *cobra.Command {
 		},
 	}
 	declarationCmd.AddCommand(
-		// createDeclarationCmd(),
+		createDeclarationCmd(),
 		getDeclarationCmd(),
-		// deleteDeclarationCmd(),
+		deleteDeclarationCmd(),
 		getSetsDeclarationCmd(),
 	)
 
@@ -42,7 +42,7 @@ func declarationCmd() *cobra.Command {
 // getDeclarationCmd retrieves a declaration from the server
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
-		Use:     "get [ declaration identifier ]",
+		Use:     "get com.example.declaration",
 		Short:   fmt.Sprintf("Get declaration details for identifier"),
 		Long:    fmt.Sprintf("Get declaration details for identifier"),
 		Args:    cobra.ExactArgs(1),
@@ -138,30 +138,24 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 // createDeclarationCmd creates a new declaration based on a JSON file on disk
 func createDeclarationCmd() *cobra.Command {
 	createCmd := &cobra.Command{
-		Use:     "create",
+		Use:     "create /path/to/declaration.json",
 		Short:   fmt.Sprintf("Create a declaration"),
 		Long:    fmt.Sprintf("Create a declaration"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    createDeclarationFn,
 	}
 
-	createCmd.Flags().StringP("json", "j", "", "json payload to create a declaration")
-	createCmd.MarkFlagRequired("json")
-
 	return createCmd
 }
 
-func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
-	jsonPath, err := cmd.Flags().GetString("json")
-	if err != nil {
-		return err
-	}
+func createDeclarationFn(cmd *cobra.Command, args []string) error {
+	jsonPath := args[0]
 	jsonBytes, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return err
 	}
 	fmt.Printf("Creating declaration using %s\n", jsonPath)
-	fmt.Println(viper.GetString("url"))
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
 		return err
@@ -180,24 +174,19 @@ func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
 // deleteDeclarationCmd deletes a declaration from the server
 func deleteDeclarationCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
-		Use:     "delete",
+		Use:     "delete com.example.declaration",
 		Short:   fmt.Sprintf("Delete a declaration"),
 		Long:    fmt.Sprintf("Delete a declaration"),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: applyPreExecFn,
 		RunE:    deleteDeclarationFn,
 	}
 
-	deleteCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to retrieve")
-	deleteCmd.MarkFlagRequired("identifier")
-
 	return deleteCmd
 }
 
-func deleteDeclarationFn(cmd *cobra.Command, declarations []string) error {
-	identifier, err := cmd.Flags().GetString("identifier")
-	if err != nil {
-		return err
-	}
+func deleteDeclarationFn(cmd *cobra.Command, args []string) error {
+	identifier := args[0]
 	fmt.Printf("Getting declaration for identifier %s\n", identifier)
 	ddmUrl, err := url.Parse(viper.GetString("url"))
 	if err != nil {
