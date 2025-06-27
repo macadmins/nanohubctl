@@ -18,7 +18,7 @@ import (
 
 func declarationCmd() *cobra.Command {
 	declarationCmd := &cobra.Command{
-		Use:     "declaration",
+		Use:     "declaration [command]",
 		Short:   fmt.Sprintf("This verb handles all declaration related operations"),
 		Long:    fmt.Sprintf("This verb handles all declaration related operations"),
 		PreRunE: applyPreExecFn,
@@ -37,48 +37,6 @@ func declarationCmd() *cobra.Command {
 	)
 
 	return declarationCmd
-}
-
-// createDeclarationCmd creates a new declaration based on a JSON file on disk
-func createDeclarationCmd() *cobra.Command {
-	createCmd := &cobra.Command{
-		Use:     "create",
-		Short:   fmt.Sprintf("Create a declaration"),
-		Long:    fmt.Sprintf("Create a declaration"),
-		PreRunE: applyPreExecFn,
-		RunE:    createDeclarationFn,
-	}
-
-	createCmd.Flags().StringP("json", "j", "", "json payload to create a declaration")
-	createCmd.MarkFlagRequired("json")
-
-	return createCmd
-}
-
-func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
-	jsonPath, err := cmd.Flags().GetString("json")
-	if err != nil {
-		return err
-	}
-	jsonBytes, err := os.ReadFile(jsonPath)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Creating declaration using %s\n", jsonPath)
-	fmt.Println(viper.GetString("url"))
-	ddmUrl, err := url.Parse(viper.GetString("url"))
-	if err != nil {
-		return err
-	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
-	var resp *http.Response
-	err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	fmt.Println(resp.Status)
-	return nil
 }
 
 // getDeclarationCmd retrieves a declaration from the server
@@ -127,7 +85,7 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 // getSetsDeclarationCmd Lists set membership for a given declaration
 func getSetsDeclarationCmd() *cobra.Command {
 	getSetsCmd := &cobra.Command{
-		Use:     "sets",
+		Use:     "sets com.example.declaration",
 		Short:   fmt.Sprintf("List set membership for a given declaration"),
 		Long:    fmt.Sprintf("List set membership for a given declaration"),
 		Args:    cobra.ExactArgs(1),
@@ -174,6 +132,48 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	fmt.Println(PrettyJsonPrint(jsonResponse))
+	return nil
+}
+
+// createDeclarationCmd creates a new declaration based on a JSON file on disk
+func createDeclarationCmd() *cobra.Command {
+	createCmd := &cobra.Command{
+		Use:     "create",
+		Short:   fmt.Sprintf("Create a declaration"),
+		Long:    fmt.Sprintf("Create a declaration"),
+		PreRunE: applyPreExecFn,
+		RunE:    createDeclarationFn,
+	}
+
+	createCmd.Flags().StringP("json", "j", "", "json payload to create a declaration")
+	createCmd.MarkFlagRequired("json")
+
+	return createCmd
+}
+
+func createDeclarationFn(cmd *cobra.Command, declarations []string) error {
+	jsonPath, err := cmd.Flags().GetString("json")
+	if err != nil {
+		return err
+	}
+	jsonBytes, err := os.ReadFile(jsonPath)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Creating declaration using %s\n", jsonPath)
+	fmt.Println(viper.GetString("url"))
+	ddmUrl, err := url.Parse(viper.GetString("url"))
+	if err != nil {
+		return err
+	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
+	var resp *http.Response
+	err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println(resp.Status)
 	return nil
 }
 
