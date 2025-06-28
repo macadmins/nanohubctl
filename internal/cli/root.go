@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/macadmins/nanohubctl/internal/cli/ddm"
+	"github.com/macadmins/nanohubctl/internal/cli/nanocmd"
 )
 
 var (
@@ -86,6 +87,7 @@ func rootCmd() *cobra.Command {
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
 		ddm.RootCmd(),
+		nanocmd.RootCmd(),
 	)
 
 	return rootCmd

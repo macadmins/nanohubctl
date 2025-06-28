@@ -5,25 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
-	"github.com/google/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var (
-	debug bool
-	vv    bool
-)
-
-func setLoggerOpts() {
-	if vv {
-		logger.SetLevel(2)
-	}
-	logger.SetFlags(log.LUTC)
-}
 
 func applyPreExecFn(cmd *cobra.Command, args []string) error {
 	// Bind all the flags to a viper setting so we can use viper everywhere without thinking about it
@@ -133,4 +119,3 @@ func validUUID(uuid string) bool {
 	}
 	return false
 }
-
