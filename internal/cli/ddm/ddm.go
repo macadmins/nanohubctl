@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"encoding/json"
@@ -7,10 +7,10 @@ import (
 	"path"
 
 	"net/http"
-	"net/url"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/utils"
 )
 
 func ddmCmd() *cobra.Command {
@@ -97,7 +97,7 @@ func getDeclarationDdmFn(cmd *cobra.Command, ddms []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func ddmFn(cmd *cobra.Command, ddms []string) error {
 	if err != nil {
 		return err
 	}
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}

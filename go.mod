@@ -1,4 +1,4 @@
-module github.com/macadmins/ddmctl
+module github.com/macadmins/nanohubctl
 
 go 1.20
 

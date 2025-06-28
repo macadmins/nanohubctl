@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/macadmins/ddmctl/internal/cli"
+	"github.com/macadmins/nanohubctl/internal/cli"
 )
 
 func main() {
