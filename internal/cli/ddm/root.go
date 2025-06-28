@@ -7,7 +7,7 @@ import (
 func RootCmd() *cobra.Command {
 	ddmRootCmd := &cobra.Command{
 		Use:   "ddm",
-		Short: "DDM operations",
+		Short: "ddm operations on nanohub",
 		Long:  "All declarative device management operations",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			setLoggerOpts()
