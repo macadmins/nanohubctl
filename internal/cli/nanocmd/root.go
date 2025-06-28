@@ -1,13 +1,13 @@
-package ddm
+package nanocmd
 
 import (
 	"github.com/spf13/cobra"
 )
 
 func RootCmd() *cobra.Command {
-	ddmRootCmd := &cobra.Command{
-		Use:   "ddm",
-		Short: "ddm operations on nanohub",
+	nanocmdRootCmd := &cobra.Command{
+		Use:   "nanocmd",
+		Short: "nanocmd operations on nanohub",
 		Long:  "All declarative device management operations",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
@@ -17,13 +17,9 @@ func RootCmd() *cobra.Command {
 		},
 	}
 
-	ddmRootCmd.AddCommand(
-		declarationsCmd(),
-		declarationCmd(),
-		setCmd(),
-		deviceCmd(),
-		ddmCmd(),
+	nanocmdRootCmd.AddCommand(
+		WorkflowCmd(),
 	)
 
-	return ddmRootCmd
+	return nanocmdRootCmd
 }

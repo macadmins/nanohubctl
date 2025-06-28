@@ -4,55 +4,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
-	"log"
 	"net/http"
 
-	"github.com/google/logger"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var (
-	debug bool
-	vv    bool
-)
-
-func setLoggerOpts() {
-	if vv {
-		logger.SetLevel(2)
-	}
-	logger.SetFlags(log.LUTC)
-}
-
-func applyPreExecFn(cmd *cobra.Command, args []string) error {
-	// Bind all the flags to a viper setting so we can use viper everywhere without thinking about it
-	if err := viper.BindPFlag("url", cmd.Flags().Lookup("url")); err != nil {
-		return errors.New("failed to bind url to viper")
-	}
-	if err := viper.BindPFlag("api_key", cmd.Flags().Lookup("api_key")); err != nil {
-		return errors.New("failed to bind key to viper")
-	}
-	if err := viper.BindPFlag("client_id", cmd.Flags().Lookup("client_id")); err != nil {
-		return errors.New("failed to bind id to viper")
-	}
-	// If declaration or declarations is called, skip the UUID check
-	if !(cmd.Name() == "declarations" || cmd.Name() == "declaration" || cmd.Parent().Name() == "declaration") {
-		clientUUID := viper.GetString("client_id")
-		if !validUUID(clientUUID) {
-			return errors.New("Invalid UUID provided")
-		}
-	}
-	// Make sure mandatory values are present before continuing
-	if viper.GetString("URL") == "" {
-		return errors.New("Base Url must be provided!")
-	}
-	if viper.GetString("API_KEY") == "" {
-		return errors.New("API Key must be provided!")
-	}
-
-	return nil
-}
 
 func putReq(url string, resp **http.Response) error {
 	req, err := http.NewRequest("PUT", url, nil)
@@ -126,11 +81,3 @@ func PrettyJsonPrint(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
 }
-
-func validUUID(uuid string) bool {
-	if len(uuid) == 36 || len(uuid) == 25 {
-		return true
-	}
-	return false
-}
-

@@ -23,7 +23,7 @@ func deviceCmd() *cobra.Command {
 		Use:     "device",
 		Short:   fmt.Sprintf("This verb handles all device related operations"),
 		Long:    fmt.Sprintf("This verb handles all device related operations"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
 				return err
@@ -50,7 +50,7 @@ func getDeviceCmd() *cobra.Command {
 		Use:     "sets",
 		Short:   fmt.Sprintf("Get a list of all sets for a given device"),
 		Long:    fmt.Sprintf("Get a list of all sets for a given device"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getdeviceFn,
 	}
 
@@ -90,7 +90,7 @@ func addDeviceCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Add a device to a declaration set"),
 		Long:    fmt.Sprintf("Add a device to a declaration set"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    addDeviceFn,
 	}
 
@@ -133,7 +133,7 @@ func removeDeviceCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Remove a device from a declaration set"),
 		Long:    fmt.Sprintf("Remove a device from a declaration set"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    removeDeviceFn,
 	}
 
@@ -198,7 +198,7 @@ func declarationStatusCmd() *cobra.Command {
 		Use:     "declarations [--client-id $ID]",
 		Short:   fmt.Sprintf("List declarations for a specified device ID"),
 		Long:    fmt.Sprintf("List declarations for a specified device ID"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
 
@@ -211,7 +211,7 @@ func errorsCmd() *cobra.Command {
 		Use:     "errors [--client-id $ID]",
 		Short:   fmt.Sprintf("List errors for a specified device ID"),
 		Long:    fmt.Sprintf("List errors for a specified device ID"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
 
@@ -224,7 +224,7 @@ func valuesCmd() *cobra.Command {
 		Use:     "values [--client-id $ID]",
 		Short:   fmt.Sprintf("List values for a specified device ID"),
 		Long:    fmt.Sprintf("List values for a specified device ID"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
 
