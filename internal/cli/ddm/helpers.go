@@ -3,7 +3,6 @@ package ddm
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"net/http"
 
 	"github.com/spf13/viper"
@@ -75,9 +74,4 @@ func deleteReq(url string, resp **http.Response) error {
 		return err
 	}
 	return nil
-}
-
-func PrettyJsonPrint(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }

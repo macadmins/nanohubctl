@@ -19,8 +19,8 @@ import (
 func declarationCmd() *cobra.Command {
 	declarationCmd := &cobra.Command{
 		Use:     "declaration [command]",
-		Short:   fmt.Sprintf("This verb handles all declaration related operations"),
-		Long:    fmt.Sprintf("This verb handles all declaration related operations"),
+		Short:   "Declaration related operations",
+		Long:    "Declaration related operations",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
@@ -43,8 +43,8 @@ func declarationCmd() *cobra.Command {
 func getDeclarationCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "get com.example.declaration",
-		Short:   fmt.Sprintf("Get declaration details for identifier"),
-		Long:    fmt.Sprintf("Get declaration details for identifier"),
+		Short:   "Get declaration details for identifier",
+		Long:    "Get declaration details for identifier",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getDeclarationFn,
@@ -78,7 +78,7 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
@@ -86,8 +86,8 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 func getSetsDeclarationCmd() *cobra.Command {
 	getSetsCmd := &cobra.Command{
 		Use:     "sets com.example.declaration",
-		Short:   fmt.Sprintf("List set membership for a given declaration"),
-		Long:    fmt.Sprintf("List set membership for a given declaration"),
+		Short:   "List set membership for a given declaration",
+		Long:    "List set membership for a given declaration",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getSetsDeclarationFn,
@@ -131,7 +131,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
@@ -139,8 +139,8 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 func createDeclarationCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "create /path/to/declaration.json",
-		Short:   fmt.Sprintf("Create a declaration"),
-		Long:    fmt.Sprintf("Create a declaration"),
+		Short:   "Create declaration",
+		Long:    "Create declaration",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    createDeclarationFn,
@@ -175,8 +175,8 @@ func createDeclarationFn(cmd *cobra.Command, args []string) error {
 func deleteDeclarationCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete com.example.declaration",
-		Short:   fmt.Sprintf("Delete a declaration"),
-		Long:    fmt.Sprintf("Delete a declaration"),
+		Short:   "Delete declaration",
+		Long:    "Delete declaration",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    deleteDeclarationFn,

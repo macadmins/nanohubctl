@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/macadmins/nanohubctl/internal/utils"
 )
@@ -16,8 +17,8 @@ import (
 func ddmCmd() *cobra.Command {
 	ddmCmd := &cobra.Command{
 		Use:     "ddm",
-		Short:   fmt.Sprintf("This verb handles all ddm endpoint related operations"),
-		Long:    fmt.Sprintf("This verb handles all ddm endpoint related operations"),
+		Short:   "ddm endpoint related operations",
+		Long:    "ddm endpoint related operations",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
@@ -30,9 +31,10 @@ func ddmCmd() *cobra.Command {
 	ddmCmd.PersistentFlags().StringP("ID", "i", "", "Identifier of the client to return ddm for")
 	ddmCmd.MarkPersistentFlagRequired("ID")
 	ddmCmd.AddCommand(
-		tokenDdmCmd(),
-		declarationsDdmCmd(),
-		getDeclarationDdmCmd(),
+	// ToDo - Fix these commands
+	// tokenDdmCmd(),
+	// declarationsDdmCmd(),
+	// getDeclarationDdmCmd(),
 	)
 
 	return ddmCmd
@@ -42,8 +44,8 @@ func ddmCmd() *cobra.Command {
 func tokenDdmCmd() *cobra.Command {
 	tokenDdmCmd := &cobra.Command{
 		Use:     "token",
-		Short:   fmt.Sprintf("Show DDM token for a given device ID"),
-		Long:    fmt.Sprintf("Show DDM token for a given device ID"),
+		Short:   "Show DDM token for a given device ID",
+		Long:    "Show DDM token for a given device ID",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    ddmFn,
 	}
@@ -54,9 +56,9 @@ func tokenDdmCmd() *cobra.Command {
 // declarationsDdmCmd shows all declaration items for a given device ID from the ddm endpoint
 func declarationsDdmCmd() *cobra.Command {
 	declarationsDdmCmd := &cobra.Command{
-		Use:     "declarations",
-		Short:   fmt.Sprintf("Show declaration items from the ddm endpoint"),
-		Long:    fmt.Sprintf("Show declaration items from the ddm endpoint"),
+		Use:     "declaration-items",
+		Short:   "Show declaration items from the ddm endpoint",
+		Long:    "Show declaration items from the ddm endpoint",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    ddmFn,
 	}
@@ -67,9 +69,9 @@ func declarationsDdmCmd() *cobra.Command {
 // getDeclarationDdmCmd gets a specific declaration type about a given device ID from the ddm endpoint
 func getDeclarationDdmCmd() *cobra.Command {
 	getDeclarationDdmCmd := &cobra.Command{
-		Use:     "declaration",
-		Short:   fmt.Sprintf("Get a specific declaration type about a given device ID from the ddm endpoint"),
-		Long:    fmt.Sprintf("Get a specific declaration type about a given device ID from the ddm endpoint"),
+		Use:     "declaration-details",
+		Short:   "Get a specific declaration type about a given device ID from the ddm endpoint",
+		Long:    "Get a specific declaration type about agiven device ID from the ddm endpoint",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getDeclarationDdmFn,
 	}
@@ -117,23 +119,26 @@ func getDeclarationDdmFn(cmd *cobra.Command, ddms []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
 // ddmFn handles all logic for the various ddm commands
 func ddmFn(cmd *cobra.Command, ddms []string) error {
-	deviceID, err := cmd.Flags().GetString("ID")
-	if err != nil {
-		return err
-	}
+	deviceID := viper.GetString("client_id")
+	// deviceID, err := cmd.Flags().GetString("ID")
+	// if err != nil {
+	// 	return err
+	// }
 	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
+	fmt.Println(cmd.Name())
 	switch cmd.Use {
 	case "token":
 		ddmUrl.Path = path.Join(ddmUrl.Path, "tokens")
+		fmt.Println(ddmUrl.String())
 	case "declarations":
 		ddmUrl.Path = path.Join(ddmUrl.Path, "declaration-items")
 	case "errors":
@@ -156,6 +161,6 @@ func ddmFn(cmd *cobra.Command, ddms []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }

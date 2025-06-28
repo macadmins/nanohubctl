@@ -19,8 +19,8 @@ import (
 func setCmd() *cobra.Command {
 	setCmd := &cobra.Command{
 		Use:     "set",
-		Short:   fmt.Sprintf("This verb handles all set related operations"),
-		Long:    fmt.Sprintf("This verb handles all set related operations"),
+		Short:   "Handles all set related operations",
+		Long:    "Handles all set related operations",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
@@ -43,8 +43,8 @@ func setCmd() *cobra.Command {
 func listSetsCmd() *cobra.Command {
 	listCmd := &cobra.Command{
 		Use:     "list",
-		Short:   fmt.Sprintf("list all sets"),
-		Long:    fmt.Sprintf("list all sets"),
+		Short:   "List all sets",
+		Long:    "List all sets",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    listSetsFn,
 	}
@@ -74,7 +74,7 @@ func listSetsFn(cmd *cobra.Command, args []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
@@ -82,8 +82,8 @@ func listSetsFn(cmd *cobra.Command, args []string) error {
 func getSetCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "get [set name]",
-		Short:   fmt.Sprintf("Get the declarations for a set"),
-		Long:    fmt.Sprintf("Get the declarations for a set"),
+		Short:   "Get the declarations for a set",
+		Long:    "Get the declarations for a set",
 		Args:    cobra.MinimumNArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getSetFn,
@@ -119,7 +119,7 @@ func getSetFn(cmd *cobra.Command, args []string) error {
 		fmt.Println("No declarations found")
 		return nil
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
@@ -127,8 +127,8 @@ func getSetFn(cmd *cobra.Command, args []string) error {
 func addSetCmd() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:     "add",
-		Short:   fmt.Sprintf("Add a declaration to a set"),
-		Long:    fmt.Sprintf("Add a declaration to a set"),
+		Short:   "Add a declaration to a set",
+		Long:    "Add a declaration to a set",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    addSetFn,
 	}
@@ -153,13 +153,17 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 	}
 
 	resp, err := addOrDeleteSetItem("add", name, identifier, ddmUrl)
+	if err != nil {
+		return err
+	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusNotModified {
+	switch resp.StatusCode {
+	case http.StatusNotModified:
 		fmt.Printf("%s is already in %s", identifier, name)
-	} else if resp.StatusCode == http.StatusNoContent {
+	case http.StatusNoContent:
 		fmt.Printf("%s has been added to set: %s", identifier, name)
-	} else {
+	default:
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -175,8 +179,8 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 func deleteSetCmd() *cobra.Command {
 	deleteCmd := &cobra.Command{
 		Use:     "delete",
-		Short:   fmt.Sprintf("Delete a declaration from a set"),
-		Long:    fmt.Sprintf("Delete a declaration from a set"),
+		Short:   "Delete a declaration from a set",
+		Long:    "Delete a declaration from a set",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    deleteSetFn,
 	}
@@ -202,13 +206,17 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 	}
 
 	resp, err := addOrDeleteSetItem("delete", name, identifier, ddmUrl)
+	if err != nil {
+		return err
+	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusNotModified {
+	switch resp.StatusCode {
+	case http.StatusNotModified:
 		fmt.Printf("%s does not exist in %s", identifier, name)
-	} else if resp.StatusCode == http.StatusNoContent {
+	case http.StatusNoContent:
 		fmt.Printf("%s has been removed from set: %s", identifier, name)
-	} else {
+	default:
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {

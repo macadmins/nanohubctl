@@ -21,8 +21,8 @@ import (
 func deviceCmd() *cobra.Command {
 	deviceCmd := &cobra.Command{
 		Use:     "device",
-		Short:   fmt.Sprintf("This verb handles all device related operations"),
-		Long:    fmt.Sprintf("This verb handles all device related operations"),
+		Short:   "Device related operations",
+		Long:    "Device related operations",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
@@ -48,8 +48,8 @@ func deviceCmd() *cobra.Command {
 func getDeviceCmd() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:     "sets",
-		Short:   fmt.Sprintf("Get a list of all sets for a given device"),
-		Long:    fmt.Sprintf("Get a list of all sets for a given device"),
+		Short:   "Get all sets for a given device",
+		Long:    "Get all sets for a given device",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getdeviceFn,
 	}
@@ -79,7 +79,7 @@ func getdeviceFn(cmd *cobra.Command, args []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }
 
@@ -87,8 +87,8 @@ func getdeviceFn(cmd *cobra.Command, args []string) error {
 func addDeviceCmd() *cobra.Command {
 	addDeviceCmd := &cobra.Command{
 		Use:     "add",
-		Short:   fmt.Sprintf("Add a device to a declaration set"),
-		Long:    fmt.Sprintf("Add a device to a declaration set"),
+		Short:   "Add a device to a declaration set",
+		Long:    "Add a device to a declaration set",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    addDeviceFn,
@@ -108,13 +108,17 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 	}
 
 	resp, err := addOrDeletedeviceItem("add", deviceID, set, ddmUrl)
+	if err != nil {
+		return err
+	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusNotModified {
+	switch resp.StatusCode {
+	case http.StatusNotModified:
 		fmt.Printf("%s is already in %s", deviceID, set)
-	} else if resp.StatusCode == http.StatusNoContent {
+	case http.StatusNoContent:
 		fmt.Printf("%s has been added to %s", deviceID, set)
-	} else {
+	default:
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -130,8 +134,8 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 func removeDeviceCmd() *cobra.Command {
 	removeDeviceCmd := &cobra.Command{
 		Use:     "remove",
-		Short:   fmt.Sprintf("Remove a device from a declaration set"),
-		Long:    fmt.Sprintf("Remove a device from a declaration set"),
+		Short:   "Remove device from an enrollment set",
+		Long:    "Remove device from an enrollment set",
 		Args:    cobra.ExactArgs(1),
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    removeDeviceFn,
@@ -152,13 +156,17 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 	}
 
 	resp, err := addOrDeletedeviceItem("remove", deviceID, set, ddmUrl)
+	if err != nil {
+		return err
+	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusNotModified {
+	switch resp.StatusCode {
+	case http.StatusNotModified:
 		fmt.Printf("%s is not in set: %s\n", deviceID, set)
-	} else if resp.StatusCode == http.StatusNoContent {
+	case http.StatusNoContent:
 		fmt.Printf("%s has been removed from %s", deviceID, set)
-	} else {
+	default:
 		if resp.StatusCode == http.StatusInternalServerError {
 			return fmt.Errorf("Set does not exist\n")
 		}
@@ -196,8 +204,8 @@ func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http
 func declarationStatusCmd() *cobra.Command {
 	declarationStatusCmd := &cobra.Command{
 		Use:     "declarations [--client-id $ID]",
-		Short:   fmt.Sprintf("List declarations for a specified device ID"),
-		Long:    fmt.Sprintf("List declarations for a specified device ID"),
+		Short:   "List declarations for a specified device ID",
+		Long:    "List declarations for a specified device ID",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -209,8 +217,8 @@ func declarationStatusCmd() *cobra.Command {
 func errorsCmd() *cobra.Command {
 	errorsCmd := &cobra.Command{
 		Use:     "errors [--client-id $ID]",
-		Short:   fmt.Sprintf("List errors for a specified device ID"),
-		Long:    fmt.Sprintf("List errors for a specified device ID"),
+		Short:   "List errors for a specified device ID",
+		Long:    "List errors for a specified device ID",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -222,8 +230,8 @@ func errorsCmd() *cobra.Command {
 func valuesCmd() *cobra.Command {
 	valuesCmd := &cobra.Command{
 		Use:     "values [--client-id $ID]",
-		Short:   fmt.Sprintf("List values for a specified device ID"),
-		Long:    fmt.Sprintf("List values for a specified device ID"),
+		Short:   "List values for a specified device ID",
+		Long:    "List values for a specified device ID",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    StatusFn,
 	}
@@ -264,6 +272,6 @@ func StatusFn(cmd *cobra.Command, statuss []string) error {
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
 		return err
 	}
-	fmt.Println(PrettyJsonPrint(jsonResponse))
+	fmt.Println(utils.PrettyJsonPrint(jsonResponse))
 	return nil
 }

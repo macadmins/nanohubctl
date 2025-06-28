@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/google/logger"
@@ -34,7 +33,7 @@ func ExecuteWithContext(ctx context.Context) error {
 
 func rootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   fmt.Sprintf("nanohubctl"),
+		Use:   "nanohubctl [ subcommand ]",
 		Short: "A command line tool for working with nanohub",
 		Long:  "A command line tool for working with nanohub APIs",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
