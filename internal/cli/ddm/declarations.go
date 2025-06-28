@@ -19,7 +19,7 @@ func declarationsCmd() *cobra.Command {
 		Use:     "declarations",
 		Short:   fmt.Sprintf("This verb gets a list of all declarations"),
 		Long:    fmt.Sprintf("This verb gets a list of all declarations"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// if err := cmd.Help(); err != nil {
 			// 	return err

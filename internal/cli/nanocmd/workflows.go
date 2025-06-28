@@ -41,10 +41,11 @@ func StartWorkflow(workflowName, clientID string) (*http.Response, error) {
 // WorkflowCmd creates the workflow command
 func WorkflowCmd() *cobra.Command {
 	workflowCmd := &cobra.Command{
-		Use:   "workflow <workflow-name> [client-id]",
-		Short: "Start a workflow for a specific client",
-		Long:  "Start a workflow by name for a specific client ID. If client-id is not provided, uses --client-id flag value.",
-		Args:  cobra.RangeArgs(1, 2),
+		Use:     "workflow <workflow-name> [client-id]",
+		Short:   "Start a workflow for a specific client",
+		Long:    "Start a workflow by name for a specific client ID. If client-id is not provided, uses --client-id flag value.",
+		Args:    cobra.RangeArgs(1, 2),
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return cmd.Help()

@@ -17,7 +17,9 @@ func RootCmd() *cobra.Command {
 		},
 	}
 
-	nanocmdRootCmd.AddCommand(WorkflowCmd())
+	nanocmdRootCmd.AddCommand(
+		WorkflowCmd(),
+	)
 
 	return nanocmdRootCmd
 }

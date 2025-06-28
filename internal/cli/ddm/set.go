@@ -21,7 +21,7 @@ func setCmd() *cobra.Command {
 		Use:     "set",
 		Short:   fmt.Sprintf("This verb handles all set related operations"),
 		Long:    fmt.Sprintf("This verb handles all set related operations"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
 				return err
@@ -45,7 +45,7 @@ func listSetsCmd() *cobra.Command {
 		Use:     "list",
 		Short:   fmt.Sprintf("list all sets"),
 		Long:    fmt.Sprintf("list all sets"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    listSetsFn,
 	}
 
@@ -85,7 +85,7 @@ func getSetCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Get the declarations for a set"),
 		Long:    fmt.Sprintf("Get the declarations for a set"),
 		Args:    cobra.MinimumNArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getSetFn,
 	}
 
@@ -129,7 +129,7 @@ func addSetCmd() *cobra.Command {
 		Use:     "add",
 		Short:   fmt.Sprintf("Add a declaration to a set"),
 		Long:    fmt.Sprintf("Add a declaration to a set"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    addSetFn,
 	}
 
@@ -177,7 +177,7 @@ func deleteSetCmd() *cobra.Command {
 		Use:     "delete",
 		Short:   fmt.Sprintf("Delete a declaration from a set"),
 		Long:    fmt.Sprintf("Delete a declaration from a set"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    deleteSetFn,
 	}
 

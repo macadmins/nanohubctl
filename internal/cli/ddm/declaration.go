@@ -21,7 +21,7 @@ func declarationCmd() *cobra.Command {
 		Use:     "declaration [command]",
 		Short:   fmt.Sprintf("This verb handles all declaration related operations"),
 		Long:    fmt.Sprintf("This verb handles all declaration related operations"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
 				return err
@@ -46,7 +46,7 @@ func getDeclarationCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Get declaration details for identifier"),
 		Long:    fmt.Sprintf("Get declaration details for identifier"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getDeclarationFn,
 	}
 
@@ -89,7 +89,7 @@ func getSetsDeclarationCmd() *cobra.Command {
 		Short:   fmt.Sprintf("List set membership for a given declaration"),
 		Long:    fmt.Sprintf("List set membership for a given declaration"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getSetsDeclarationFn,
 	}
 
@@ -142,7 +142,7 @@ func createDeclarationCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Create a declaration"),
 		Long:    fmt.Sprintf("Create a declaration"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    createDeclarationFn,
 	}
 
@@ -178,7 +178,7 @@ func deleteDeclarationCmd() *cobra.Command {
 		Short:   fmt.Sprintf("Delete a declaration"),
 		Long:    fmt.Sprintf("Delete a declaration"),
 		Args:    cobra.ExactArgs(1),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    deleteDeclarationFn,
 	}
 

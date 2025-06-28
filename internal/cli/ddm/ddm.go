@@ -18,7 +18,7 @@ func ddmCmd() *cobra.Command {
 		Use:     "ddm",
 		Short:   fmt.Sprintf("This verb handles all ddm endpoint related operations"),
 		Long:    fmt.Sprintf("This verb handles all ddm endpoint related operations"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Help(); err != nil {
 				return err
@@ -44,7 +44,7 @@ func tokenDdmCmd() *cobra.Command {
 		Use:     "token",
 		Short:   fmt.Sprintf("Show DDM token for a given device ID"),
 		Long:    fmt.Sprintf("Show DDM token for a given device ID"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    ddmFn,
 	}
 
@@ -57,7 +57,7 @@ func declarationsDdmCmd() *cobra.Command {
 		Use:     "declarations",
 		Short:   fmt.Sprintf("Show declaration items from the ddm endpoint"),
 		Long:    fmt.Sprintf("Show declaration items from the ddm endpoint"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    ddmFn,
 	}
 
@@ -70,7 +70,7 @@ func getDeclarationDdmCmd() *cobra.Command {
 		Use:     "declaration",
 		Short:   fmt.Sprintf("Get a specific declaration type about a given device ID from the ddm endpoint"),
 		Long:    fmt.Sprintf("Get a specific declaration type about a given device ID from the ddm endpoint"),
-		PreRunE: applyPreExecFn,
+		PreRunE: utils.ApplyPreExecFn,
 		RunE:    getDeclarationDdmFn,
 	}
 
