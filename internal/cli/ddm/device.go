@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"encoding/json"
@@ -13,6 +13,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/utils"
 )
 
 // deviceCmd manages set membership for a given device
@@ -57,7 +59,7 @@ func getDeviceCmd() *cobra.Command {
 
 func getdeviceFn(cmd *cobra.Command, args []string) error {
 	deviceID := viper.GetString("client_id")
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -100,7 +102,7 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 
 	set := args[0]
 
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -144,7 +146,7 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 	set := args[0]
 
 	fmt.Printf("Adding device %s to set %s...\n", deviceID, set)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -232,7 +234,7 @@ func valuesCmd() *cobra.Command {
 // StatusFn handles all logic for the various status commands
 func StatusFn(cmd *cobra.Command, statuss []string) error {
 	clientID := viper.GetString("client_id")
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}

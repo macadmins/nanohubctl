@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"encoding/json"
@@ -11,7 +11,8 @@ import (
 	"net/url"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/utils"
 )
 
 // setCmd handles creation and management of declaration sets
@@ -53,7 +54,7 @@ func listSetsCmd() *cobra.Command {
 
 func listSetsFn(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Listing all available sets\n")
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ func getSetCmd() *cobra.Command {
 func getSetFn(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	fmt.Printf("Getting set for identifier %s\n\n", name)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -146,7 +147,7 @@ func addSetFn(cmd *cobra.Command, sets []string) error {
 		return err
 	}
 	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -195,7 +196,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 		return err
 	}
 	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}

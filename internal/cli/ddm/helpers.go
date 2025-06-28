@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"bytes"
@@ -11,6 +11,11 @@ import (
 	"github.com/google/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	debug bool
+	vv    bool
 )
 
 func setLoggerOpts() {
@@ -128,3 +133,4 @@ func validUUID(uuid string) bool {
 	}
 	return false
 }
+

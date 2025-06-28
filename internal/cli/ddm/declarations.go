@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"encoding/json"
@@ -10,7 +10,8 @@ import (
 	"net/url"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/utils"
 )
 
 func declarationsCmd() *cobra.Command {
@@ -23,12 +24,12 @@ func declarationsCmd() *cobra.Command {
 			// if err := cmd.Help(); err != nil {
 			// 	return err
 			// }
-			ddmGetDeclsUrl, err := url.Parse(viper.GetString("url"))
+			ddmUrl, err := utils.GetDDMUrl()
 			if err != nil {
 				return err
 			}
-			ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "declarations")
-			allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
+			ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
+			allDecls, nil := getAllDeclarations(ddmUrl)
 			for _, decl := range allDecls {
 				fmt.Println(decl)
 			}

@@ -3,10 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/google/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/cli/ddm"
 )
 
 var (
@@ -17,15 +20,22 @@ var (
 	version string = "0.0.5"
 )
 
+func setLoggerOpts() {
+	if vv {
+		logger.SetLevel(2)
+	}
+	logger.SetFlags(log.LUTC)
+}
+
 func ExecuteWithContext(ctx context.Context) error {
 	return rootCmd().ExecuteContext(ctx)
 }
 
 func rootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   fmt.Sprintf("ddmctl"),
-		Short: "A command line tool for working with ddm",
-		Long:  "A command line tool for working with declarative device management",
+		Use:   fmt.Sprintf("nanohubctl"),
+		Short: "A command line tool for working with nanohub",
+		Long:  "A command line tool for working with nanohub APIs",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			setLoggerOpts()
 		},
@@ -64,7 +74,7 @@ func rootCmd() *cobra.Command {
 
 	// Set up ENV namespace and ENV vars
 	// All env vars will be prefixed with DDM
-	viper.SetEnvPrefix("DDM")
+	viper.SetEnvPrefix("NANOHUB")
 	viper.BindEnv("URL")
 	viper.BindEnv("API_KEY")
 	viper.BindEnv("API_USER")
@@ -75,12 +85,7 @@ func rootCmd() *cobra.Command {
 
 	// Import subCmds into the rootCmd
 	rootCmd.AddCommand(
-		declarationsCmd(),
-		declarationCmd(),
-		setCmd(),
-		deviceCmd(),
-		// ToDo - revise ddm command and uncomment
-		// ddmCmd(),
+		ddm.RootCmd(),
 	)
 
 	return rootCmd

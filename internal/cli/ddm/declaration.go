@@ -1,4 +1,4 @@
-package cli
+package ddm
 
 import (
 	"encoding/json"
@@ -10,10 +10,10 @@ import (
 	"slices"
 
 	"net/http"
-	"net/url"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/macadmins/nanohubctl/internal/utils"
 )
 
 func declarationCmd() *cobra.Command {
@@ -57,11 +57,11 @@ func getDeclarationFn(cmd *cobra.Command, args []string) error {
 	identifier := args[0]
 
 	fmt.Printf("Getting declaration for identifier %s\n", identifier)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
-	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations", identifier)
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations", identifier)
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -99,7 +99,7 @@ func getSetsDeclarationCmd() *cobra.Command {
 func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 	identifier := args[0]
 
-	ddmGetDeclsUrl, err := url.Parse(viper.GetString("url"))
+	ddmGetDeclsUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -110,11 +110,11 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("Getting set membership for identifier %s\n", identifier)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
-	ddmUrl.Path = path.Join(ddmUrl.Path, "/declaration-sets", identifier)
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
+	ddmUrl.Path = path.Join(ddmUrl.Path, "/declaration-sets", identifier)
 	var resp *http.Response
 	err = getReq(ddmUrl.String(), &resp)
 	if err != nil {
@@ -156,7 +156,7 @@ func createDeclarationFn(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	fmt.Printf("Creating declaration using %s\n", jsonPath)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func deleteDeclarationCmd() *cobra.Command {
 func deleteDeclarationFn(cmd *cobra.Command, args []string) error {
 	identifier := args[0]
 	fmt.Printf("Getting declaration for identifier %s\n", identifier)
-	ddmUrl, err := url.Parse(viper.GetString("url"))
+	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
 	}
