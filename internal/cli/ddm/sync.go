@@ -71,8 +71,7 @@ func syncDirFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return nil
 	}
-	fmt.Printf("Processed %d declarations\n", len(declJSONPaths))
-	fmt.Printf("Processed %d declaration sets\n", len(setPaths))
+	fmt.Printf("Synced %d declarations to NanoHUB\n", len(declJSONPaths))
 	return nil
 }
 
@@ -111,6 +110,9 @@ func syncSets(setPaths []string) error {
 		if err != nil {
 			return err
 		}
+	}
+	for setName, items := range declSets {
+		fmt.Printf("Synced %d declarations in set '%s'\n", len(items), setName)
 	}
 	return nil
 }

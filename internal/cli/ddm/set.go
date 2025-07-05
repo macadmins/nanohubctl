@@ -156,7 +156,7 @@ func addSetFn(cmd *cobra.Command, args []string) error {
 
 func addSet(name string, identifier ...string) error {
 	for _, decl_id := range identifier {
-		fmt.Printf("Adding %s to set %s...\n\n", decl_id, name)
+		fmt.Printf("\nAdding %s to set %s...\n", decl_id, name)
 
 		resp, err := addOrDeleteSetItem("add", name, decl_id)
 		if err != nil {
@@ -242,7 +242,6 @@ func addOrDeleteSetItem(action, name, identifier string) (*http.Response, error)
 	}
 	// Set the path
 	ddmUrl.Path = path.Join(ddmUrl.Path, "/set-declarations/", name)
-	fmt.Println(ddmUrl.String())
 	// Add the query arguments
 	q := ddmUrl.Query()
 	q.Set("declaration", identifier)
