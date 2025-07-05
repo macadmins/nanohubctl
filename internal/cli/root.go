@@ -18,7 +18,7 @@ var (
 	debug bool
 	vv    bool
 
-	version string = "0.0.6"
+	version string = "1.0.0"
 )
 
 func setLoggerOpts() {
