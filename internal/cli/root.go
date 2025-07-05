@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/macadmins/nanohubctl/internal/cli/ddm"
+	"github.com/macadmins/nanohubctl/internal/cli/godeclr"
 	"github.com/macadmins/nanohubctl/internal/cli/nanocmd"
 )
 
@@ -87,6 +88,7 @@ func rootCmd() *cobra.Command {
 	rootCmd.AddCommand(
 		ddm.RootCmd(),
 		nanocmd.RootCmd(),
+		godeclr.RootCmd(),
 	)
 
 	return rootCmd
