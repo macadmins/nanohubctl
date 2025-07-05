@@ -14,7 +14,7 @@ import (
 
 func TypeCmd() *cobra.Command {
 	typeCmd := &cobra.Command{
-		Use:   "type",
+		Use:   "type [declaration type] [-full]",
 		Short: "type",
 		Long:  "Show an example of the specified declaration type",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -39,8 +39,6 @@ func TypeCmd() *cobra.Command {
 			var declobj any = decl
 			if viper.GetBool("full") {
 				payload := tagutil.FullFields(decl.Payload)
-				fmt.Println("payload")
-				fmt.Println(payload)
 				if err = tagutil.SetDefaults(payload); err != nil {
 					fmt.Println("could not fill out declaration:", err)
 					os.Exit(1)
