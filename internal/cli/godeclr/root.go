@@ -6,7 +6,7 @@ import (
 
 func RootCmd() *cobra.Command {
 	goDeclrRootCmd := &cobra.Command{
-		Use:   "godeclr -id [IDENTIFIER] -token [TOKEN] -type [TYPE]",
+		Use:   "godeclr [subcommand]",
 		Short: "godeclr",
 		Long:  "Generates DDM Declarations based on the device-management schemas",
 		RunE: func(cmd *cobra.Command, args []string) error {
