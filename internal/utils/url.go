@@ -8,14 +8,14 @@ import (
 )
 
 // GetDDMUrl returns the base nanohub URL with the proper DDM API path
-func GetDDMUrl() (*url.URL, error) {
+func GetDDMUrl() (url.URL, error) {
 	baseUrl := viper.GetString("url")
 	ddmUrl, err := url.Parse(baseUrl)
 	if err != nil {
-		return nil, err
+		return url.URL{}, err
 	}
 	ddmUrl.Path = path.Join(ddmUrl.Path, "api/v1/ddm")
-	return ddmUrl, nil
+	return *ddmUrl, nil
 }
 
 // GetNanoCmdUrl returns the base nanohub URL with the proper NanoCMD API path

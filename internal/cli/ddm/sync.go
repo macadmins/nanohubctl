@@ -1,6 +1,7 @@
 package ddm
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -31,7 +32,8 @@ func syncDirFn(cmd *cobra.Command, args []string) error {
 	}
 
 	// Collect all JSON file paths
-	var jsonPaths []string
+	var declJSONPaths []string
+	var setPaths []string
 
 	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -39,11 +41,19 @@ func syncDirFn(cmd *cobra.Command, args []string) error {
 		}
 
 		// Skip directories and non-JSON files
-		if info.IsDir() || !strings.HasSuffix(strings.ToLower(path), ".json") {
+		if info.IsDir() {
 			return nil
 		}
+		if strings.HasSuffix(strings.ToLower(path), ".json") {
+			declJSONPaths = append(declJSONPaths, path)
+			return nil
+		}
+		// Match files that start with the word "set" and end with ".txt"
+		if strings.HasSuffix(path, ".txt") && strings.HasPrefix(filepath.Base(path), "set") {
+			fmt.Println(path)
+			setPaths = append(setPaths, path)
+		}
 
-		jsonPaths = append(jsonPaths, path)
 		if err != nil {
 			return fmt.Errorf("error walking directory: %v", err)
 		}
@@ -53,10 +63,64 @@ func syncDirFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	err = createDeclaration(jsonPaths...)
+	err = createDeclaration(declJSONPaths...)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Finished syncing %s - processed %d declaration files\n", dirPath, len(jsonPaths))
+	err = syncSets(setPaths)
+	if err != nil {
+		return nil
+	}
+	fmt.Printf("Processed %d declarations\n", len(declJSONPaths))
+	fmt.Printf("Processed %d declaration sets\n", len(setPaths))
 	return nil
+}
+
+func syncSets(setPaths []string) error {
+	declSets := make(map[string][]string)
+	for _, setPath := range setPaths {
+		setName := setNameFromPath(setPath)
+		declSets[setName] = []string{}
+		file, err := os.Open(setPath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(strings.TrimSpace(line), "#") || line == "" {
+				continue
+			}
+			declSets[setName] = append(declSets[setName], strings.TrimSpace(line))
+		}
+
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Error reading file: %v\n", err)
+		}
+	}
+	// Now process the declaratiosn for each set
+	for setName, identifiers := range declSets {
+		if len(identifiers) == 0 {
+			fmt.Printf("No identifiers found for set %s, skipping...\n", setName)
+			continue
+		}
+		err := addSet(setName, identifiers...)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Derive set name from file name and normalize it
+func setNameFromPath(setName string) string {
+	setName = filepath.Base(setName)
+	setName = strings.TrimSpace(setName)
+	setName = strings.TrimPrefix(setName, "set.")
+	setName = strings.TrimSuffix(setName, ".txt")
+	setName = strings.ToLower(setName)
+	return setName
 }

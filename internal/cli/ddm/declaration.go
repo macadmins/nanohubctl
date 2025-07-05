@@ -104,7 +104,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "declarations")
-	allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
+	allDecls, nil := getAllDeclarations(&ddmGetDeclsUrl)
 	if !slices.Contains(allDecls, identifier) {
 		return fmt.Errorf("%s is not a valid declaration", identifier)
 	}
