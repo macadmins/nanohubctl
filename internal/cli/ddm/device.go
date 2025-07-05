@@ -109,9 +109,9 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 	defer resp.Body.Close()
 	switch resp.StatusCode {
 	case http.StatusNotModified:
-		fmt.Printf("%s is already in %s", deviceID, set)
+		fmt.Printf("%s is already in %s\n", deviceID, set)
 	case http.StatusNoContent:
-		fmt.Printf("%s has been added to %s", deviceID, set)
+		fmt.Printf("%s has been added to %s\n", deviceID, set)
 	default:
 		fmt.Println(resp.Status)
 		body, err := io.ReadAll(resp.Body)
@@ -143,7 +143,7 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 
 	set := args[0]
 
-	fmt.Printf("Adding device %s to set %s...\n", deviceID, set)
+	fmt.Printf("Removing device %s from set %s...\n", deviceID, set)
 
 	resp, err := addOrDeletedeviceItem("remove", deviceID, set)
 	if err != nil {
@@ -155,7 +155,7 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 	case http.StatusNotModified:
 		fmt.Printf("%s is not in set: %s\n", deviceID, set)
 	case http.StatusNoContent:
-		fmt.Printf("%s has been removed from %s", deviceID, set)
+		fmt.Printf("%s has been removed from %s\n", deviceID, set)
 	default:
 		if resp.StatusCode == http.StatusInternalServerError {
 			return fmt.Errorf("Set does not exist\n")
