@@ -21,15 +21,12 @@ func declarationsCmd() *cobra.Command {
 		Long:    "List all declarations currently on the server",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// if err := cmd.Help(); err != nil {
-			// 	return err
-			// }
 			ddmUrl, err := utils.GetDDMUrl()
 			if err != nil {
 				return err
 			}
 			ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
-			allDecls, nil := getAllDeclarations(ddmUrl)
+			allDecls, nil := getAllDeclarations(&ddmUrl)
 			for _, decl := range allDecls {
 				fmt.Println(decl)
 			}

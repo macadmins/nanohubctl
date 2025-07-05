@@ -22,6 +22,7 @@ func RootCmd() *cobra.Command {
 		declarationCmd(),
 		setCmd(),
 		deviceCmd(),
+		syncCmd(),
 		// ToDo - Fix ddmCmd stuff
 		// Make it more clear how these differ from the other commands
 		// tokenDdmCmd(),

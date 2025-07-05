@@ -8,7 +8,6 @@ import (
 	"path"
 
 	"net/http"
-	"net/url"
 
 	"github.com/spf13/cobra"
 
@@ -125,53 +124,64 @@ func getSetFn(cmd *cobra.Command, args []string) error {
 
 // addSetCmd adds a declaration to a given set
 func addSetCmd() *cobra.Command {
-	createCmd := &cobra.Command{
-		Use:     "add",
+	addToSetCmd := &cobra.Command{
+		Use:     "add [--name SET_NAME] [--identifier DECLARATION_IDENTIFIER]",
 		Short:   "Add a declaration to a set",
 		Long:    "Add a declaration to a set",
 		PreRunE: utils.ApplyPreExecFn,
 		RunE:    addSetFn,
 	}
 
-	createCmd.Flags().StringP("name", "n", "", "Name of the set to add item to")
-	createCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to add to the set")
-	createCmd.MarkFlagsRequiredTogether("name", "identifier")
+	addToSetCmd.Flags().StringP("name", "n", "", "Name of the set to add item to")
+	addToSetCmd.Flags().StringP("identifier", "i", "", "Identifier of the declaration to add to the set")
+	addToSetCmd.MarkFlagRequired("name")
+	addToSetCmd.MarkFlagRequired("identifier")
+	addToSetCmd.MarkFlagsRequiredTogether("name", "identifier")
 
-	return createCmd
+	return addToSetCmd
 }
 
-func addSetFn(cmd *cobra.Command, sets []string) error {
+func addSetFn(cmd *cobra.Command, args []string) error {
 	name, err := cmd.Flags().GetString("name")
 	identifier, err := cmd.Flags().GetString("identifier")
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
-	ddmUrl, err := utils.GetDDMUrl()
+	err = addSet(name, identifier)
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
-	resp, err := addOrDeleteSetItem("add", name, identifier, ddmUrl)
-	if err != nil {
-		return err
-	}
+func addSet(name string, identifier ...string) error {
+	for _, decl_id := range identifier {
+		fmt.Printf("\nAdding %s to set %s...\n", decl_id, name)
 
-	defer resp.Body.Close()
-	switch resp.StatusCode {
-	case http.StatusNotModified:
-		fmt.Printf("%s is already in %s", identifier, name)
-	case http.StatusNoContent:
-		fmt.Printf("%s has been added to set: %s", identifier, name)
-	default:
-		fmt.Println(resp.Status)
-		body, err := io.ReadAll(resp.Body)
+		resp, err := addOrDeleteSetItem("add", name, decl_id)
 		if err != nil {
-			log.Fatalln(err)
+			return err
 		}
-		return fmt.Errorf(string(body))
-	}
 
+		defer resp.Body.Close()
+		switch resp.StatusCode {
+		case http.StatusNotModified:
+			fmt.Printf("%s is already in %s\n", decl_id, name)
+		case http.StatusNoContent:
+			fmt.Printf("%s has been added to set: %s\n", decl_id, name)
+		default:
+			fmt.Println(resp.Status)
+			_, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatalln(err)
+				fmt.Println("Error adding declaration to set:", decl_id, "in", name)
+			}
+			fmt.Println("Error adding declaration to set:", decl_id, "in", name)
+			continue
+			// return fmt.Errorf(string(body))
+		}
+
+	}
 	return nil
 }
 
@@ -200,12 +210,8 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 		return err
 	}
 	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
-	ddmUrl, err := utils.GetDDMUrl()
-	if err != nil {
-		return err
-	}
 
-	resp, err := addOrDeleteSetItem("delete", name, identifier, ddmUrl)
+	resp, err := addOrDeleteSetItem("delete", name, identifier)
 	if err != nil {
 		return err
 	}
@@ -229,7 +235,11 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 }
 
 // addOrDeleteSetItem handles http for add and remove, probably better to just duplicate the code.
-func addOrDeleteSetItem(action, name, identifier string, ddmUrl *url.URL) (*http.Response, error) {
+func addOrDeleteSetItem(action, name, identifier string) (*http.Response, error) {
+	ddmUrl, err := utils.GetDDMUrl()
+	if err != nil {
+		return nil, err
+	}
 	// Set the path
 	ddmUrl.Path = path.Join(ddmUrl.Path, "/set-declarations/", name)
 	// Add the query arguments

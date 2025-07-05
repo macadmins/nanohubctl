@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"net/http"
-	"net/url"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -102,12 +101,7 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 
 	set := args[0]
 
-	ddmUrl, err := utils.GetDDMUrl()
-	if err != nil {
-		return err
-	}
-
-	resp, err := addOrDeletedeviceItem("add", deviceID, set, ddmUrl)
+	resp, err := addOrDeletedeviceItem("add", deviceID, set)
 	if err != nil {
 		return err
 	}
@@ -150,12 +144,8 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 	set := args[0]
 
 	fmt.Printf("Adding device %s to set %s...\n", deviceID, set)
-	ddmUrl, err := utils.GetDDMUrl()
-	if err != nil {
-		return err
-	}
 
-	resp, err := addOrDeletedeviceItem("remove", deviceID, set, ddmUrl)
+	resp, err := addOrDeletedeviceItem("remove", deviceID, set)
 	if err != nil {
 		return err
 	}
@@ -181,7 +171,11 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 }
 
 // addOrDeletedeviceItem handles http for add and remove, probably better to just duplicate the code. Oh well.
-func addOrDeletedeviceItem(action, deviceID, set string, ddmUrl *url.URL) (*http.Response, error) {
+func addOrDeletedeviceItem(action, deviceID, set string) (*http.Response, error) {
+	ddmUrl, err := utils.GetDDMUrl()
+	if err != nil {
+		return nil, err
+	}
 	// Device path for the enrollment set
 	ddmUrl.Path = path.Join(ddmUrl.Path, "enrollment-sets", deviceID)
 	// Add the query arguments

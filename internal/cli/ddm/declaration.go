@@ -104,7 +104,7 @@ func getSetsDeclarationFn(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	ddmGetDeclsUrl.Path = path.Join(ddmGetDeclsUrl.Path, "declarations")
-	allDecls, nil := getAllDeclarations(ddmGetDeclsUrl)
+	allDecls, nil := getAllDeclarations(&ddmGetDeclsUrl)
 	if !slices.Contains(allDecls, identifier) {
 		return fmt.Errorf("%s is not a valid declaration", identifier)
 	}
@@ -151,23 +151,29 @@ func createDeclarationCmd() *cobra.Command {
 
 func createDeclarationFn(cmd *cobra.Command, args []string) error {
 	jsonPath := args[0]
-	jsonBytes, err := os.ReadFile(jsonPath)
-	if err != nil {
-		return err
+	return createDeclaration(jsonPath)
+}
+
+func createDeclaration(declJSONPaths ...string) error {
+	for _, jsonPath := range declJSONPaths {
+		jsonBytes, err := os.ReadFile(jsonPath)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Creating declaration using %s\n", jsonPath)
+		ddmUrl, err := utils.GetDDMUrl()
+		if err != nil {
+			return err
+		}
+		ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
+		var resp *http.Response
+		err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		fmt.Println(resp.Status)
 	}
-	fmt.Printf("Creating declaration using %s\n", jsonPath)
-	ddmUrl, err := utils.GetDDMUrl()
-	if err != nil {
-		return err
-	}
-	ddmUrl.Path = path.Join(ddmUrl.Path, "declarations")
-	var resp *http.Response
-	err = putJsonReq(ddmUrl.String(), jsonBytes, &resp)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	fmt.Println(resp.Status)
 	return nil
 }
 
