@@ -56,7 +56,6 @@ func getDeclarationCmd() *cobra.Command {
 func getDeclarationFn(cmd *cobra.Command, args []string) error {
 	identifier := args[0]
 
-	fmt.Printf("Getting declaration for identifier %s\n", identifier)
 	ddmUrl, err := utils.GetDDMUrl()
 	if err != nil {
 		return err
