@@ -159,7 +159,7 @@ func createDeclaration(declJSONPaths ...string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Creating declaration using %s\n", jsonPath)
+		// fmt.Printf("Creating declaration using %s\n", jsonPath)
 		ddmUrl, err := utils.GetDDMUrl()
 		if err != nil {
 			return err
@@ -171,7 +171,21 @@ func createDeclaration(declJSONPaths ...string) error {
 			return err
 		}
 		defer resp.Body.Close()
-		fmt.Println(resp.Status)
+		switch resp.StatusCode {
+		case http.StatusNotModified:
+			// fmt.Printf("%s has not changed, no changes synced\n\n", jsonPath)
+		case http.StatusNoContent:
+			fmt.Printf("Successfully synced %s\n\n", jsonPath)
+		default:
+			fmt.Println(resp.Status)
+			_, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatalln(err)
+				fmt.Println("Error syncing declaration:", jsonPath)
+			}
+			fmt.Println("Error syncing declaration", jsonPath)
+			continue
+		}
 	}
 	return nil
 }

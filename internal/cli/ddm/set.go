@@ -156,7 +156,7 @@ func addSetFn(cmd *cobra.Command, args []string) error {
 
 func addSet(name string, identifier ...string) error {
 	for _, decl_id := range identifier {
-		fmt.Printf("\nAdding %s to set %s...\n", decl_id, name)
+		// fmt.Printf("\nAdding %s to set %s...\n", decl_id, name)
 
 		resp, err := addOrDeleteSetItem("add", name, decl_id)
 		if err != nil {
@@ -166,7 +166,7 @@ func addSet(name string, identifier ...string) error {
 		defer resp.Body.Close()
 		switch resp.StatusCode {
 		case http.StatusNotModified:
-			fmt.Printf("%s is already in %s\n", decl_id, name)
+			// fmt.Printf("%s is already in %s\n", decl_id, name)
 		case http.StatusNoContent:
 			fmt.Printf("%s has been added to set: %s\n", decl_id, name)
 		default:
@@ -209,7 +209,6 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Adding %s to set %s...\n\n", identifier, name)
 
 	resp, err := addOrDeleteSetItem("delete", name, identifier)
 	if err != nil {

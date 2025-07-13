@@ -50,7 +50,7 @@ func syncDirFn(cmd *cobra.Command, args []string) error {
 		}
 		// Match files that start with the word "set" and end with ".txt"
 		if strings.HasSuffix(path, ".txt") && strings.HasPrefix(filepath.Base(path), "set") {
-			fmt.Println(path)
+			fmt.Printf("Processing %s\n", path)
 			setPaths = append(setPaths, path)
 		}
 
