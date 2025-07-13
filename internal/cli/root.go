@@ -18,7 +18,7 @@ var (
 	debug bool
 	vv    bool
 
-	version string = "1.0.7"
+	version string = "1.0.8"
 )
 
 func setLoggerOpts() {
@@ -89,6 +89,7 @@ func rootCmd() *cobra.Command {
 		ddm.RootCmd(),
 		nanocmd.RootCmd(),
 		godeclr.RootCmd(),
+		newCmd(),
 	)
 
 	return rootCmd
