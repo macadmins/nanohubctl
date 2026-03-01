@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.4
 
 require (
-	github.com/google/logger v1.1.1
+	github.com/google/logger v1.1.2
 	github.com/google/uuid v1.6.0
 	github.com/korylprince/go-adm v0.0.0-20250628053232-f774c71e5bf0
 	github.com/spf13/cobra v1.9.1
