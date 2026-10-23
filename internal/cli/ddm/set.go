@@ -178,7 +178,7 @@ func addSet(name string, identifier ...string) error {
 			}
 			fmt.Println("Error adding declaration to set:", decl_id, "in", name)
 			continue
-			// return fmt.Errorf(string(body))
+			// return fmt.Errorf("%s", body)
 		}
 
 	}
@@ -227,7 +227,7 @@ func deleteSetFn(cmd *cobra.Command, sets []string) error {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		return fmt.Errorf(string(body))
+		return fmt.Errorf("%s", body)
 	}
 
 	return nil

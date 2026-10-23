@@ -118,7 +118,7 @@ func addDeviceFn(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		return fmt.Errorf(string(body))
+		return fmt.Errorf("%s", body)
 	}
 
 	return nil
@@ -164,7 +164,7 @@ func removeDeviceFn(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		return fmt.Errorf(string(body))
+		return fmt.Errorf("%s", body)
 	}
 
 	return nil
