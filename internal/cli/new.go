@@ -39,10 +39,10 @@ func newCmdFn(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get home directory: %v", err)
 	}
-	
+
 	configDir := filepath.Join(homeDir, ".nanohubctl")
 	configFile := filepath.Join(configDir, "config.json")
-	
+
 	// Check if config file already exists
 	if _, err := os.Stat(configFile); err == nil {
 		// Config exists, read and display it
@@ -50,17 +50,17 @@ func newCmdFn(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("failed to read existing config: %v", err)
 		}
-		
+
 		var existingResp ProvisioningResponse
 		if err := json.Unmarshal(data, &existingResp); err != nil {
 			return fmt.Errorf("failed to parse existing config: %v", err)
 		}
-		
+
 		fmt.Printf("You already have a nanohub instance configured:\n\n")
 		printInstanceInfo(existingResp)
 		return nil
 	}
-	
+
 	// Config doesn't exist, proceed with creating new instance
 	token, err := cmd.Flags().GetString("token")
 	if err != nil {
@@ -107,13 +107,13 @@ func newCmdFn(cmd *cobra.Command, args []string) error {
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return fmt.Errorf("failed to create config directory: %v", err)
 	}
-	
+
 	// Save the response to config file
 	configData, err := json.MarshalIndent(provisioningResp, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal config data: %v", err)
 	}
-	
+
 	if err := os.WriteFile(configFile, configData, 0600); err != nil {
 		return fmt.Errorf("failed to write config file: %v", err)
 	}

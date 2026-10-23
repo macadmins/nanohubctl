@@ -1,8 +1,6 @@
 module github.com/macadmins/nanohubctl
 
-go 1.23.0
-
-toolchain go1.23.4
+go 1.27.3
 
 require (
 	github.com/google/logger v1.1.1
